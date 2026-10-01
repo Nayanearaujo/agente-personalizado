@@ -10,6 +10,16 @@ from validacao import carregar_config
 RAIZ = Path(__file__).resolve().parent
 CONFIG = carregar_config(RAIZ / "config.yml")
 
+# O chat usa uma API externa. Esta função registra o suporte ao ZeroGPU
+# exigido pelo ambiente da aula e não é chamada nas conversas.
+if os.environ.get("SPACE_ID"):
+    import spaces
+
+    @spaces.GPU
+    def _reserva_gpu():
+        return None
+
+
 
 def mensagem_erro(erro):
     codigo = getattr(erro, "status_code", None)
@@ -92,7 +102,7 @@ def criar_interface():
 
 if __name__ == "__main__":
     criar_interface().queue().launch(
-        server_name=os.environ.get("GRADIO_SERVER_NAME", "127.0.0.1"),
+        server_name=os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0" if os.environ.get("SPACE_ID") else "127.0.0.1"),
         server_port=int(os.environ.get("PORT", "7860")),
         allowed_paths=[str(RAIZ / "logo.svg")], share=False,
     )

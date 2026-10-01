@@ -6,7 +6,7 @@ colorTo: green
 sdk: gradio
 sdk_version: 5.49.1
 app_file: app.py
-python_version: "3.11"
+python_version: "3.12"
 pinned: false
 ---
 
@@ -23,7 +23,7 @@ Instale Python 3.11 ou 3.12. Baixe este repositório em **Code > Download ZIP**,
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-local.txt
 python testes.py
 python iniciar.py
 ```
@@ -32,7 +32,7 @@ python iniciar.py
 
 ```powershell
 py -3 -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m pip install -r requirements-local.txt
 .venv\Scripts\python.exe testes.py
 .venv\Scripts\python.exe iniciar.py
 ```
@@ -54,14 +54,14 @@ O portão confere T1 a T9. Os testes de conversa usam simulações e não gastam
 
 ## Publicar no Hugging Face
 
-A conta naycode mostrou exigência de plano pago para criar Gradio Spaces. O código está preparado para um Space Gradio com CPU; a hospedagem não está contratada nem criada. Se a turma disponibilizar ZeroGPU, revisar as exigências desse hardware antes de habilitar publicação.
+Space criado: https://huggingface.co/spaces/oaraujo/chargeback-intelligence, com SDK Gradio e ZeroGPU confirmado pela tela de configurações. O app registra uma função com @spaces.GPU, conforme o exemplo da aula, sem solicitar GPU nas conversas. A geração de respostas acontece no OpenRouter.
 
-Quando existir um Space compatível:
+Para concluir a publicação:
 
-1. Crie o Space com nome chargeback-intelligence, SDK Gradio e hardware CPU compatível.
+1. Use o Space oaraujo/chargeback-intelligence com SDK Gradio e hardware ZeroGPU.
 2. Em Settings do Space, cadastre OPENROUTER_API_KEY como **secret**.
 3. No GitHub, em Settings > Secrets and variables > Actions, cadastre HF_TOKEN como **secret**, com permissão de escrita no Space.
-4. Na aba Variables do mesmo painel, cadastre PUBLICAR_SPACE com valor true. HF_USUARIO e HF_SPACE têm padrões naycode e chargeback-intelligence; use variáveis com esses nomes se precisar alterar.
+4. Na aba Variables do mesmo painel, cadastre PUBLICAR_SPACE com valor true. HF_USUARIO e HF_SPACE têm padrões oaraujo e chargeback-intelligence; use variáveis com esses nomes se precisar alterar.
 5. Na aba Actions, execute o workflow **Testar e publicar**.
 6. Confira os jobs, o build do Space e o estado Running. Abra a URL e teste uma conversa.
 

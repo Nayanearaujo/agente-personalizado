@@ -14,9 +14,7 @@ Python, Gradio, OpenAI SDK para acessar o OpenRouter e PyYAML. Fixar as versões
 
 Modelo inicial: openrouter/free. Somente OpenRouter nesta etapa, seguindo o exemplo da apostila.
 
-Hugging Face: usuário naycode; Space pretendido chargeback-intelligence; SDK Gradio. A tela da conta atual exige plano pago para criar o Space. Nenhum Space está confirmado. Manter publicação desativada até resolver a hospedagem, sem contratar automaticamente.
-
-A apostila usa ZeroGPU. Se esse hardware estiver disponível, conferir as exigências atuais da biblioteca spaces antes de implementar sua integração. Não inserir uma função fictícia de GPU sem verificar compatibilidade. Usar logo SVG evita envio de imagem binária no fluxo Git do exemplo.
+Hugging Face: usuário oaraujo; Space chargeback-intelligence; SDK Gradio e ZeroGPU confirmados em 01/10/2026. O app registra _reserva_gpu com @spaces.GPU conforme o exemplo da aula. A função não é chamada pelo chat, que consulta o OpenRouter. Python 3.12 no Space e no CI. O arquivo requirements-local.txt evita instalar dependências de GPU no computador e nos testes locais. A publicação continua desativada até cadastrar os segredos.
 
 ## 3. Estrutura de arquivos
 
@@ -98,7 +96,7 @@ O envio segue o fluxo Git da apostila, com histórico completo. Serializar publi
 Configurar manualmente:
 - OPENROUTER_API_KEY nos secrets do Space.
 - HF_TOKEN nos secrets de Actions do GitHub, com permissão suficiente para o Space.
-- HF_USUARIO=naycode e HF_SPACE=chargeback-intelligence.
+- HF_USUARIO=oaraujo e HF_SPACE=chargeback-intelligence.
 - PUBLICAR_SPACE=false inicialmente; habilitar apenas quando houver Space compatível.
 
 Com publicação desativada, testes podem passar e o job publicar será ignorado. Isso não é deploy concluído. Falha de build remoto exige consultar logs e restaurar uma versão funcional; o portão não garante que todo build remoto tenha sucesso.
