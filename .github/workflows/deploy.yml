@@ -1,0 +1,69 @@
+name: Testar e publicar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicacao-main
+  cancel-in-progress: false
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Instalar dependências
+        run: python -m pip install -r requirements.txt
+      - name: Rodar o portão T1 a T9
+        run: python testes.py
+      - name: Conferir comportamento sem chamar o modelo
+        run: python -m unittest test_comportamento.py
+
+  publicar:
+    needs: testar
+    if: ${{ vars.PUBLICAR_SPACE == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      HF_USUARIO: ${{ vars.HF_USUARIO || 'naycode' }}
+      HF_SPACE: ${{ vars.HF_SPACE || 'chargeback-intelligence' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enviar ao Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$HF_TOKEN" ]; then
+            echo "Cadastre HF_TOKEN nos secrets do repositório."
+            exit 1
+          fi
+          if [[ ! "$HF_USUARIO" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || [[ ! "$HF_SPACE" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]]; then
+            echo "Confira HF_USUARIO e HF_SPACE."
+            exit 1
+          fi
+          ASKPASS_FILE=$(mktemp)
+          trap 'rm -f "$ASKPASS_FILE"' EXIT
+          cat > "$ASKPASS_FILE" <<'SCRIPT'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf '%s\n' "$HF_USUARIO" ;;
+            *Password*) printf '%s\n' "$HF_TOKEN" ;;
+          esac
+          SCRIPT
+          chmod 700 "$ASKPASS_FILE"
+          export GIT_ASKPASS="$ASKPASS_FILE"
+          export GIT_TERMINAL_PROMPT=0
+          git push --force "https://huggingface.co/spaces/${HF_USUARIO}/${HF_SPACE}" HEAD:main
