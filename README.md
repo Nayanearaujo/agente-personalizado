@@ -78,3 +78,7 @@ Prepare de 3 a 5 documentos públicos sobre estatística e machine learning em M
 ## Referência da aula
 
 Referência: https://github.com/azrosolucoestecnologicas/agente-personalizado e apostila da Parte 1. Especialidade: Estatística e Machine Learning. A logo fica em assets/logo.svg. Somente o modelo gratuito google/gemma-4-31b-it:free é usado. O SSR experimental do Gradio fica desativado.
+
+## Alternativa gratuita
+
+O Gemma é tentado primeiro. Quando o OpenRouter identifica uma falha elegível antes da resposta, pode tentar openai/gpt-oss-20b:free. A solicitação limita o preço dos tokens de entrada e saída a zero. Nenhuma chave adicional é necessária. Limites da conta ou indisponibilidade de ambos os modelos ainda podem impedir uma resposta.

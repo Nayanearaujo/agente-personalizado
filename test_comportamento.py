@@ -41,6 +41,11 @@ class Conversa(unittest.TestCase):
             self.assertEqual(list(app.responder("Agora", anterior)), ["Olá", "Olá mundo"])
         self.assertEqual([m["role"] for m in Cliente.argumentos["messages"]], ["system", "user", "assistant", "user"])
         self.assertEqual(Cliente.argumentos["messages"][-1]["content"], "Agora")
+        modelos = Cliente.argumentos["extra_body"]["models"]
+        self.assertEqual(modelos[0], app.CONFIG["modelo"])
+        self.assertTrue(all(modelo.endswith(":free") for modelo in modelos))
+        self.assertEqual(Cliente.argumentos["extra_body"]["provider"]["max_price"],
+                         {"prompt": 0, "completion": 0})
 
     def test_falha_parcial_sem_expor_erro(self):
         Cliente.eventos = ["Início", RuntimeError("conteudo-privado")]

@@ -49,6 +49,8 @@ def responder(mensagem, historico):
             fluxo = cliente.chat.completions.create(
                 model=CONFIG["modelo"], messages=mensagens,
                 max_tokens=CONFIG["max_tokens"], stream=True,
+                extra_body={"models": [CONFIG["modelo"], "openai/gpt-oss-20b:free"],
+                            "provider": {"max_price": {"prompt": 0, "completion": 0}}},
             )
             for evento in fluxo:
                 if evento.choices:
