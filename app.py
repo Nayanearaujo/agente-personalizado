@@ -41,31 +41,38 @@ def responder(mensagem, historico):
         if item.get("role") in ("user", "assistant") and isinstance(item.get("content"), str):
             mensagens.append({"role": item["role"], "content": item["content"]})
     mensagens.append({"role": "user", "content": mensagem})
-    resposta = ""
-    fluxo = None
-    try:
-        with OpenAI(base_url="https://openrouter.ai/api/v1", api_key=chave,
-                    timeout=60.0, max_retries=0) as cliente:
-            fluxo = cliente.chat.completions.create(
-                model=CONFIG["modelo"], messages=mensagens,
-                max_tokens=CONFIG["max_tokens"], stream=True,
-                extra_body={"models": [CONFIG["modelo"], "openai/gpt-oss-20b:free"],
-                            "provider": {"max_price": {"prompt": 0, "completion": 0}}},
-            )
-            for evento in fluxo:
-                if evento.choices:
-                    trecho = evento.choices[0].delta.content
-                    if trecho:
-                        resposta += trecho
-                        yield resposta
-            if not resposta:
-                yield "O modelo não retornou uma resposta. Tente novamente."
-    except Exception as erro:
-        aviso = mensagem_erro(erro)
-        yield (resposta + "\n\nA resposta foi interrompida. " + aviso) if resposta else aviso
-    finally:
-        if fluxo is not None:
-            fluxo.close()
+    modelos = list(dict.fromkeys([CONFIG["modelo"], "openai/gpt-oss-20b:free"]))
+    for indice, modelo in enumerate(modelos):
+        resposta = ""
+        fluxo = None
+        try:
+            with OpenAI(base_url="https://openrouter.ai/api/v1", api_key=chave,
+                        timeout=60.0, max_retries=0) as cliente:
+                fluxo = cliente.chat.completions.create(
+                    model=modelo, messages=mensagens,
+                    max_tokens=CONFIG["max_tokens"], stream=True,
+                    extra_body={"provider": {"max_price": {"prompt": 0, "completion": 0}}},
+                )
+                for evento in fluxo:
+                    if evento.choices:
+                        trecho = evento.choices[0].delta.content
+                        if trecho:
+                            resposta += trecho
+                            yield resposta
+                if not resposta:
+                    yield "O modelo não retornou uma resposta. Tente novamente."
+            return
+        except Exception as erro:
+            codigo = getattr(erro, "status_code", None)
+            print(f"Modelo {modelo}: HTTP {codigo}", flush=True)
+            if not resposta and codigo in (404, 429, 500, 502, 503, 504) and indice + 1 < len(modelos):
+                continue
+            aviso = mensagem_erro(erro)
+            yield (resposta + "\n\nA resposta foi interrompida. " + aviso) if resposta else aviso
+            return
+        finally:
+            if fluxo is not None:
+                fluxo.close()
 
 
 def criar_interface():

@@ -41,9 +41,7 @@ class Conversa(unittest.TestCase):
             self.assertEqual(list(app.responder("Agora", anterior)), ["Olá", "Olá mundo"])
         self.assertEqual([m["role"] for m in Cliente.argumentos["messages"]], ["system", "user", "assistant", "user"])
         self.assertEqual(Cliente.argumentos["messages"][-1]["content"], "Agora")
-        modelos = Cliente.argumentos["extra_body"]["models"]
-        self.assertEqual(modelos[0], app.CONFIG["modelo"])
-        self.assertTrue(all(modelo.endswith(":free") for modelo in modelos))
+        self.assertEqual(Cliente.argumentos["model"], app.CONFIG["modelo"])
         self.assertEqual(Cliente.argumentos["extra_body"]["provider"]["max_price"],
                          {"prompt": 0, "completion": 0})
 
@@ -53,6 +51,21 @@ class Conversa(unittest.TestCase):
             saida = list(app.responder("Oi", []))[-1]
         self.assertIn("interrompida", saida)
         self.assertNotIn("conteudo-privado", saida)
+
+    def test_alternativa_apos_429(self):
+        Cliente.eventos = ["Resposta educativa"]
+        modelos = []
+        original = Cliente.create
+        def tentativa(cliente, **kwargs):
+            modelos.append(kwargs["model"])
+            if len(modelos) == 1:
+                erro = RuntimeError("falha privada")
+                erro.status_code = 429
+                raise erro
+            return original(cliente, **kwargs)
+        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "valor-ficticio"}), patch.object(app, "OpenAI", Cliente), patch.object(Cliente, "create", tentativa):
+            self.assertEqual(list(app.responder("Média?", [])), ["Resposta educativa"])
+        self.assertEqual(modelos, [app.CONFIG["modelo"], "openai/gpt-oss-20b:free"])
 
     def test_interface(self):
         self.assertIsNotNone(app.criar_interface())
