@@ -28,7 +28,7 @@ def arquivos_projeto():
 def main():
     erros = []
     try:
-        carregar_config(RAIZ / "config.yml")
+        carregar_config(RAIZ / "config.yaml")
         print("T1 a T7: configuração aprovada.")
     except ConfiguracaoInvalida as erro:
         erros.extend(str(erro).splitlines())

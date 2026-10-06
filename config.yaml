@@ -2,7 +2,7 @@ nome: Aprendendo Dados
 descricao: Agente de IA personalizado que explica estatística e machine learning com exemplos práticos e exercícios, passo a passo.
 cor_principal: "#142C40"
 cor_secundaria: "#096B66"
-logo: logo.svg
+logo: assets/logo.svg
 logo_tamanho: 64
 modelo: google/gemma-4-31b-it:free
 max_tokens: 800

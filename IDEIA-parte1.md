@@ -14,7 +14,7 @@ Adaptar a profundidade ao aluno. Começar pela intuição, explicar os símbolos
 
 ## Como eu quero personalizar
 
-Editar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas de exemplo pelo config.yml no GitHub.
+Editar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas de exemplo pelo config.yaml no GitHub.
 
 ## Como eu quero publicar
 

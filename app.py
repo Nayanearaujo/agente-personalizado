@@ -8,7 +8,7 @@ from openai import OpenAI
 from validacao import carregar_config
 
 RAIZ = Path(__file__).resolve().parent
-CONFIG = carregar_config(RAIZ / "config.yml")
+CONFIG = carregar_config(RAIZ / "config.yaml")
 
 # O chat usa uma API externa. Esta função registra o suporte ao ZeroGPU
 # exigido pelo ambiente da aula e não é chamada nas conversas.
@@ -84,7 +84,7 @@ def criar_interface():
             f'width="{CONFIG["logo_tamanho"]}" height="{CONFIG["logo_tamanho"]}" alt="Logo">'
             f'<h1>{html.escape(CONFIG["nome"])}</h1><p>{html.escape(CONFIG["descricao"])}</p></header>'
         )
-        gr.Markdown("Conteúdo educativo. Use exemplos fictícios e não envie dados pessoais ou de cartão.")
+        gr.Markdown("Conteúdo educativo. Use exemplos fictícios e não envie dados pessoais ou sigilosos.")
         conversa = gr.Chatbot(type="messages", label="Conversa", height=420)
         entrada = gr.Textbox(placeholder="Escreva sua dúvida sobre estatística ou machine learning", label="Sua pergunta")
         enviar = gr.Button("Enviar", variant="primary", elem_id="enviar")
@@ -104,5 +104,5 @@ if __name__ == "__main__":
     criar_interface().queue().launch(
         server_name=os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0" if os.environ.get("SPACE_ID") else "127.0.0.1"),
         server_port=int(os.environ.get("PORT", "7860")),
-        allowed_paths=[str(RAIZ / "logo.svg")], share=False,
+        allowed_paths=[str(RAIZ / CONFIG["logo"])], share=False, ssr_mode=False,
     )

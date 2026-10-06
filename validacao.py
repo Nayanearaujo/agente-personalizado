@@ -96,7 +96,7 @@ def validar_config(config, pasta):
 
 
 def carregar_config(caminho=None):
-    arquivo = Path(caminho) if caminho else Path(__file__).with_name("config.yml")
+    arquivo = Path(caminho) if caminho else Path(__file__).with_name("config.yaml")
     try:
         config = yaml.load(arquivo.read_text(encoding="utf-8"), Loader=LeitorUnico)
     except (OSError, yaml.YAMLError) as erro:

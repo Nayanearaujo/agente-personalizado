@@ -21,8 +21,8 @@ Hugging Face: usuário oaraujo; Space chargeback-intelligence; SDK Gradio e Zero
 | Arquivo | Função |
 | --- | --- |
 | app.py | Interface e chamada ao OpenRouter |
-| config.yml | Textos, cores, logo, modelo e instruções |
-| logo.svg | Logo |
+| config.yaml | Textos, cores, logo, modelo e instruções |
+| assets/logo.svg | Logo |
 | validacao.py | Regras compartilhadas de configuração |
 | testes.py | Portão T1 a T9 |
 | requirements.txt | Dependências |
@@ -44,7 +44,7 @@ Todos os campos abaixo são obrigatórios. Os padrões são os valores entregues
 | descricao | Texto de 1 a 240 caracteres | Agente de IA personalizado que explica estatística e machine learning com exemplos práticos e exercícios, passo a passo. |
 | cor_principal | #RRGGBB entre aspas; contraste com branco de pelo menos 3:1 | #142C40 |
 | cor_secundaria | Mesma regra | #096B66 |
-| logo | SVG local dentro do projeto ou URL HTTPS sem credenciais | logo.svg |
+| logo | SVG local dentro do projeto ou URL HTTPS sem credenciais | assets/logo.svg |
 | logo_tamanho | Inteiro entre 32 e 160 | 64 |
 | modelo | Nome no formato fornecedor/modelo | google/gemma-4-31b-it:free |
 | max_tokens | Inteiro entre 1 e 4096 | 800 |

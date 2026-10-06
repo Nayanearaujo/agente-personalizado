@@ -41,7 +41,7 @@ O iniciador solicita sua chave do OpenRouter de forma oculta. Ela fica no ambien
 
 ## Personalização
 
-Edite config.yml para alterar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas. Cores devem estar entre aspas. O modelo inicial google/gemma-4-31b-it:free usa um modelo gratuito específico, sujeito a limites e disponibilidade.
+Edite config.yaml para alterar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas. Cores devem estar entre aspas. O modelo inicial google/gemma-4-31b-it:free usa um modelo gratuito específico, sujeito a limites e disponibilidade.
 
 ## Verificações
 
@@ -74,3 +74,7 @@ Troque temporariamente cor_principal por "#FFD966" e faça commit. O teste de co
 ## Próxima aula
 
 Prepare de 3 a 5 documentos públicos sobre estatística e machine learning em Markdown, sem dados pessoais ou sigilosos. Crie sua conta no Supabase. O banco, a indexação e a busca documental serão implementados na Parte 2.
+
+## Referência da aula
+
+Referência: https://github.com/azrosolucoestecnologicas/agente-personalizado e apostila da Parte 1. Especialidade: Estatística e Machine Learning. A logo fica em assets/logo.svg. Somente o modelo gratuito google/gemma-4-31b-it:free é usado. O SSR experimental do Gradio fica desativado.
