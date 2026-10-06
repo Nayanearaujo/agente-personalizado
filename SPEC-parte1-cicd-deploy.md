@@ -1,12 +1,12 @@
 # Especificação da Parte 1: CI/CD e deploy
 
-Status: aprovada para implementação em 01/10/2026. Tema adaptado para chargeback.
+Status: aprovada para implementação em 01/10/2026. Tema atualizado para Estatística e Machine Learning em 06/10/2026.
 
 ## 1. Objetivo, público e escopo
 
-Construir um chat educativo em português para estudantes e profissionais interessados em chargeback, Engenharia de Dados, Estatística e Machine Learning. O usuário abre uma URL e conversa com o assistente.
+Construir um chat educativo em português para estudantes e profissionais interessados em aprender Estatística e Machine Learning. O usuário abre uma URL e conversa com o assistente.
 
-Nesta etapa entram personalização por configuração, conversa com histórico de sessão, respostas progressivas e publicação automática com testes. Consulta a documentos fica para a Parte 2. Interface própria fica para a Parte 3. Login, histórico persistente, análise de transações e previsões ficam fora desta etapa.
+Nesta etapa entram personalização por configuração, conversa com histórico de sessão, respostas progressivas e publicação automática com testes. Consulta a documentos fica para a Parte 2. Interface própria fica para a Parte 3. Login, histórico persistente, execução de análises de arquivos e treinamento de modelos ficam fora desta etapa.
 
 ## 2. Stack e restrições do Hugging Face
 
@@ -14,7 +14,7 @@ Python, Gradio, OpenAI SDK para acessar o OpenRouter e PyYAML. Fixar as versões
 
 Modelo inicial: openrouter/free. Somente OpenRouter nesta etapa, seguindo o exemplo da apostila.
 
-Hugging Face: usuário oaraujo; Space chargeback-intelligence; SDK Gradio e ZeroGPU confirmados em 01/10/2026. O app registra _reserva_gpu com @spaces.GPU conforme o exemplo da aula. A função não é chamada pelo chat, que consulta o OpenRouter. Python 3.12 no Space e no CI. O arquivo requirements-local.txt evita instalar dependências de GPU no computador e nos testes locais. A publicação continua desativada até cadastrar os segredos.
+Hugging Face: usuário oaraujo; Space chargeback-intelligence; SDK Gradio e ZeroGPU confirmados em 01/10/2026. O app registra _reserva_gpu com @spaces.GPU conforme o exemplo da aula. A função não é chamada pelo chat, que consulta o OpenRouter. Python 3.12 no Space e no CI. O arquivo requirements-local.txt evita instalar dependências de GPU no computador e nos testes locais. A publicação automática já foi configurada; uma conversa real ainda precisa de uma chave válida do OpenRouter.
 
 ## 3. Estrutura de arquivos
 
@@ -40,16 +40,16 @@ Todos os campos abaixo são obrigatórios. Os padrões são os valores entregues
 
 | Campo | Valores aceitos | Padrão |
 | --- | --- | --- |
-| nome | Texto de 1 a 80 caracteres | Chargeback Intelligence |
-| descricao | Texto de 1 a 240 caracteres | Assistente para entender chargeback, analisar indicadores e estudar formas de prevenir perdas. |
+| nome | Texto de 1 a 80 caracteres | Aprendendo Dados |
+| descricao | Texto de 1 a 240 caracteres | Agente de IA personalizado que explica estatística e machine learning com exemplos práticos e exercícios, passo a passo. |
 | cor_principal | #RRGGBB entre aspas; contraste com branco de pelo menos 3:1 | #142C40 |
 | cor_secundaria | Mesma regra | #096B66 |
 | logo | SVG local dentro do projeto ou URL HTTPS sem credenciais | logo.svg |
 | logo_tamanho | Inteiro entre 32 e 160 | 64 |
 | modelo | Nome no formato fornecedor/modelo | openrouter/free |
 | max_tokens | Inteiro entre 1 e 4096 | 800 |
-| prompt_sistema | Texto com pelo menos 80 caracteres | Instruções educativas sobre chargeback |
-| exemplos | De 1 a 8 perguntas preenchidas | Quatro perguntas sobre conceitos, indicadores, qualidade de dados e ML |
+| prompt_sistema | Texto com pelo menos 80 caracteres | Instruções educativas sobre Estatística e Machine Learning |
+| exemplos | De 1 a 8 perguntas preenchidas | Quatro perguntas sobre estatística descritiva, probabilidade, regressão e overfitting |
 
 Rejeitar campos desconhecidos e duplicados. Nenhuma chave de API entra na configuração.
 
@@ -67,9 +67,9 @@ Rejeitar campos desconhecidos e duplicados. Nenhuma chave de API entra na config
 - RF10: Publicar somente após aprovação do portão.
 - RF11: Uma configuração reprovada não deve alterar a versão no ar.
 - RF12: Permitir execução local enquanto a hospedagem está pendente.
-- RF13: Usar exemplos fictícios, reconhecer incertezas e distinguir chargeback, fraude e reembolso.
-- RF14: Não inventar regras, prazos ou fontes; orientar consulta à documentação aplicável quando houver variação por bandeira, adquirente ou contrato.
-- RF15: Não pedir dados de cartão ou informações sigilosas, nem salvar conversas.
+- RF13: Usar exemplos numéricos fictícios, explicar símbolos e cálculos passo a passo e adaptar a profundidade ao aluno.
+- RF14: Não inventar fontes ou resultados; distinguir correlação de causalidade e explicar hipóteses e limitações dos métodos.
+- RF15: Não pedir dados pessoais ou informações sigilosas, nem salvar conversas.
 
 Instruções ao modelo não garantem ausência de erros. A Parte 2 acrescentará suporte documental.
 
@@ -115,7 +115,7 @@ Com publicação desativada, testes podem passar e o job publicar será ignorado
 - [ ] Cor #FFD966 reprova o portão sem alterar a versão publicada.
 - [ ] Restaurar a cor válida retorna o processo ao sucesso.
 
-Publicação permanece pendente até resolver a restrição da conta. A Parte 1 não está concluída só com o teste local.
+O Space já foi criado. Conferir conversa real e bloqueio de publicação antes de considerar a Parte 1 concluída.
 
 ## 9. Ordem das tarefas
 

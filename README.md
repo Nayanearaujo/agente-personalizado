@@ -1,5 +1,5 @@
 ---
-title: Chargeback Intelligence
+title: Aprendendo Dados
 emoji: 📊
 colorFrom: blue
 colorTo: green
@@ -10,9 +10,9 @@ python_version: "3.12"
 pinned: false
 ---
 
-# Chargeback Intelligence
+# Aprendendo Dados
 
-Assistente para entender chargeback, analisar indicadores e estudar formas de prevenir perdas. Nesta etapa, responde pelo OpenRouter. A consulta aos documentos será acrescentada na Parte 2.
+Agente de IA personalizado que explica estatística e machine learning com exemplos práticos e exercícios, passo a passo. Nesta etapa, responde pelo OpenRouter. A consulta aos documentos será acrescentada na Parte 2.
 
 ## Rodar no computador
 
@@ -73,4 +73,4 @@ Troque temporariamente cor_principal por "#FFD966" e faça commit. O teste de co
 
 ## Próxima aula
 
-Prepare de 3 a 5 documentos públicos sobre chargeback em Markdown, sem dados pessoais ou sigilosos. Crie sua conta no Supabase. O banco, a indexação e a busca documental serão implementados na Parte 2.
+Prepare de 3 a 5 documentos públicos sobre estatística e machine learning em Markdown, sem dados pessoais ou sigilosos. Crie sua conta no Supabase. O banco, a indexação e a busca documental serão implementados na Parte 2.

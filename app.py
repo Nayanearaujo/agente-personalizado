@@ -1,4 +1,4 @@
-"""Chat educativo de chargeback com OpenRouter."""
+"""Agente educativo de Estatística e Machine Learning com OpenRouter."""
 import html
 import os
 from pathlib import Path
@@ -86,7 +86,7 @@ def criar_interface():
         )
         gr.Markdown("Conteúdo educativo. Use exemplos fictícios e não envie dados pessoais ou de cartão.")
         conversa = gr.Chatbot(type="messages", label="Conversa", height=420)
-        entrada = gr.Textbox(placeholder="Escreva sua dúvida sobre chargeback", label="Sua pergunta")
+        entrada = gr.Textbox(placeholder="Escreva sua dúvida sobre estatística ou machine learning", label="Sua pergunta")
         enviar = gr.Button("Enviar", variant="primary", elem_id="enviar")
         parar = gr.Button("Parar resposta", variant="stop", visible=False)
         chat = gr.ChatInterface(
