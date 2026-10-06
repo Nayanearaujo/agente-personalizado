@@ -41,7 +41,10 @@ def responder(mensagem, historico):
         if item.get("role") in ("user", "assistant") and isinstance(item.get("content"), str):
             mensagens.append({"role": item["role"], "content": item["content"]})
     mensagens.append({"role": "user", "content": mensagem})
-    modelos = list(dict.fromkeys([CONFIG["modelo"], "openai/gpt-oss-20b:free"]))
+    modelos = list(dict.fromkeys([CONFIG["modelo"], "apodex/apodex-1.1-mini:free"]))
+    if any(not modelo.endswith(":free") for modelo in modelos):
+        yield "Use somente modelos gratuitos terminados em :free na configuração."
+        return
     for indice, modelo in enumerate(modelos):
         resposta = ""
         fluxo = None
@@ -51,7 +54,6 @@ def responder(mensagem, historico):
                 fluxo = cliente.chat.completions.create(
                     model=modelo, messages=mensagens,
                     max_tokens=CONFIG["max_tokens"], stream=True,
-                    extra_body={"provider": {"max_price": {"prompt": 0, "completion": 0}}},
                 )
                 for evento in fluxo:
                     if evento.choices:

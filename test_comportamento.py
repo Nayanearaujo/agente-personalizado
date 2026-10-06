@@ -42,8 +42,7 @@ class Conversa(unittest.TestCase):
         self.assertEqual([m["role"] for m in Cliente.argumentos["messages"]], ["system", "user", "assistant", "user"])
         self.assertEqual(Cliente.argumentos["messages"][-1]["content"], "Agora")
         self.assertEqual(Cliente.argumentos["model"], app.CONFIG["modelo"])
-        self.assertEqual(Cliente.argumentos["extra_body"]["provider"]["max_price"],
-                         {"prompt": 0, "completion": 0})
+        self.assertTrue(Cliente.argumentos["model"].endswith(":free"))
 
     def test_falha_parcial_sem_expor_erro(self):
         Cliente.eventos = ["Início", RuntimeError("conteudo-privado")]
@@ -65,7 +64,7 @@ class Conversa(unittest.TestCase):
             return original(cliente, **kwargs)
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "valor-ficticio"}), patch.object(app, "OpenAI", Cliente), patch.object(Cliente, "create", tentativa):
             self.assertEqual(list(app.responder("Média?", [])), ["Resposta educativa"])
-        self.assertEqual(modelos, [app.CONFIG["modelo"], "openai/gpt-oss-20b:free"])
+        self.assertEqual(modelos, [app.CONFIG["modelo"], "apodex/apodex-1.1-mini:free"])
 
     def test_interface(self):
         self.assertIsNotNone(app.criar_interface())
