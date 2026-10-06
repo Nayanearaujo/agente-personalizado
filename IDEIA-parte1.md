@@ -6,7 +6,7 @@ Construir o Aprendendo Dados, um agente de IA personalizado para ensinar Estatí
 
 ## Qual IA eu quero usar
 
-OpenRouter com openrouter/free, sem comprar créditos. Se o serviço gratuito atingir um limite, o chat deve explicar o problema, sem trocar para modelos pagos.
+OpenRouter com google/gemma-4-31b-it:free, sem comprar créditos. Se o serviço gratuito atingir um limite, o chat deve explicar o problema, sem trocar para modelos pagos.
 
 ## Como ele deve ensinar
 

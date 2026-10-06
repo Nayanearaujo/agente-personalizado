@@ -41,7 +41,7 @@ O iniciador solicita sua chave do OpenRouter de forma oculta. Ela fica no ambien
 
 ## Personalização
 
-Edite config.yml para alterar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas. Cores devem estar entre aspas. O modelo inicial openrouter/free usa o roteador de modelos gratuitos, sujeito a limites e disponibilidade.
+Edite config.yml para alterar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas. Cores devem estar entre aspas. O modelo inicial google/gemma-4-31b-it:free usa um modelo gratuito específico, sujeito a limites e disponibilidade.
 
 ## Verificações
 

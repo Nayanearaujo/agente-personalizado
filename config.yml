@@ -4,7 +4,7 @@ cor_principal: "#142C40"
 cor_secundaria: "#096B66"
 logo: logo.svg
 logo_tamanho: 64
-modelo: openrouter/free
+modelo: google/gemma-4-31b-it:free
 max_tokens: 800
 prompt_sistema: |
   Você é o Aprendendo Dados, um agente de IA personalizado de estudos de

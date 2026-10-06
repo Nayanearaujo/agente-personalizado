@@ -12,7 +12,7 @@ Nesta etapa entram personalização por configuração, conversa com histórico 
 
 Python, Gradio, OpenAI SDK para acessar o OpenRouter e PyYAML. Fixar as versões após verificar compatibilidade na implementação.
 
-Modelo inicial: openrouter/free. Somente OpenRouter nesta etapa, seguindo o exemplo da apostila.
+Modelo inicial: google/gemma-4-31b-it:free. Somente OpenRouter nesta etapa, seguindo o exemplo da apostila.
 
 Hugging Face: usuário oaraujo; Space chargeback-intelligence; SDK Gradio e ZeroGPU confirmados em 01/10/2026. O app registra _reserva_gpu com @spaces.GPU conforme o exemplo da aula. A função não é chamada pelo chat, que consulta o OpenRouter. Python 3.12 no Space e no CI. O arquivo requirements-local.txt evita instalar dependências de GPU no computador e nos testes locais. A publicação automática já foi configurada; uma conversa real ainda precisa de uma chave válida do OpenRouter.
 
@@ -46,7 +46,7 @@ Todos os campos abaixo são obrigatórios. Os padrões são os valores entregues
 | cor_secundaria | Mesma regra | #096B66 |
 | logo | SVG local dentro do projeto ou URL HTTPS sem credenciais | logo.svg |
 | logo_tamanho | Inteiro entre 32 e 160 | 64 |
-| modelo | Nome no formato fornecedor/modelo | openrouter/free |
+| modelo | Nome no formato fornecedor/modelo | google/gemma-4-31b-it:free |
 | max_tokens | Inteiro entre 1 e 4096 | 800 |
 | prompt_sistema | Texto com pelo menos 80 caracteres | Instruções educativas sobre Estatística e Machine Learning |
 | exemplos | De 1 a 8 perguntas preenchidas | Quatro perguntas sobre estatística descritiva, probabilidade, regressão e overfitting |
