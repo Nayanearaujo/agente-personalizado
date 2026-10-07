@@ -109,7 +109,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_USUARIO: ${{ vars.HF_USUARIO || 'oaraujo' }}
-          HF_ORIGEM: ${{ vars.HF_SPACE }}
+          HF_ORIGEM: ${{ vars.HF_SPACE || 'chargeback-intelligence' }}
         run: python scripts/renomear_space.py
 
       - name: Enviar para o Space e acompanhar o build
@@ -118,4 +118,3 @@ jobs:
           # Opcional: crie a variável HF_SPACE no GitHub para usar outro Space.
           HF_SPACE: ${{ env.HF_SPACE }}
         run: python scripts/publicar.py
-
