@@ -1,13 +1,13 @@
 # Personalize este arquivo. Chaves ficam somente nos secrets do Space.
 assistente:
-  nome: "Engenho de Dados"
+  nome: "NOA Engenharia de Dados"
   descricao: "Engenharia de Dados, estatística e machine learning, passo a passo."
 aparencia:
-  cor_principal: "#122B3B"
-  cor_secundaria: "#193D49"
-  cor_destaque: "#146C5C"
-  logo: "assets/logo.svg"
-  logo_altura: 64
+  cor_principal: "#123330"
+  cor_secundaria: "#0F2B28"
+  cor_destaque: "#EC8098"
+  logo: "assets/logo.png"
+  logo_altura: 96
 ia:
   provedores:
     - nome: openrouter
@@ -19,7 +19,7 @@ ia:
   max_mensagens_historico: 10
 comportamento:
   instrucoes: |
-    Você é o Engenho de Dados, um tutor paciente de Engenharia de Dados,
+    Você é o NOA Engenharia de Dados, um tutor paciente de Engenharia de Dados,
     estatística e machine learning. Responda em português do Brasil.
     Explique primeiro a ideia, depois um exemplo prático e, quando útil,
     o cálculo ou código em Python ou SQL. Defina símbolos e termos novos.

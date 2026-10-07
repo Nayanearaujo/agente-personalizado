@@ -1,6 +1,6 @@
 ---
-title: Engenho de Dados
-emoji: 📐
+title: NOA Engenharia de Dados
+emoji: 🦉
 colorFrom: blue
 colorTo: green
 sdk: gradio
@@ -11,7 +11,7 @@ short_description: Engenharia de Dados, estatística e machine learning
 pinned: false
 ---
 
-# Engenho de Dados
+# NOA Engenharia de Dados
 
 Um espaço para aprender Engenharia de Dados, estatística e machine learning em português. O assistente explica ideias, resolve exemplos com dados fictícios e ajuda a construir conhecimento, uma etapa por vez.
 
@@ -19,13 +19,13 @@ A estrutura foi adaptada do [projeto da aula](https://github.com/azrosolucoestec
 
 ## Personalizar
 
-Edite `config.yaml` no GitHub e faça commit na `main`. Nome, cores, logo, instruções, exemplos e parâmetros ficam nesse arquivo. A logo fica em `assets/logo.svg`. A publicação só começa depois que as verificações passam.
+Edite `config.yaml` no GitHub e faça commit na `main`. Nome, cores, logo, instruções, exemplos e parâmetros ficam nesse arquivo. A logo fica em `assets/logo.png`. A publicação só começa depois que as verificações passam.
 
 ## Chaves
 
 No Hugging Face, abra **Settings > Variables and secrets > New secret** e cadastre `OPENROUTER_API_KEY`. No GitHub, cadastre `HF_TOKEN` em **Settings > Secrets and variables > Actions > Secrets**, com escrita no seu Space. Não coloque chaves nos arquivos do projeto.
 
-As variáveis `HF_USUARIO` e `HF_SPACE` do GitHub identificam o destino da publicação. O workflow tenta renomear o Space existente para `engenho-de-dados`. Se o token não permitir, publica no endereço anterior e registra um aviso no Summary. Depois de uma renomeação bem-sucedida, atualize `HF_SPACE` para `engenho-de-dados`.
+As variáveis `HF_USUARIO` e `HF_SPACE` do GitHub identificam o destino da publicação. O workflow tenta renomear o Space existente para `noa-engenharia-de-dados`. Se o token não permitir, publica no endereço anterior e registra um aviso no Summary. Depois de uma renomeação bem-sucedida, atualize `HF_SPACE` para `noa-engenharia-de-dados`.
 
 ## Rodar no computador
 

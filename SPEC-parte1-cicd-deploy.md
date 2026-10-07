@@ -1,11 +1,11 @@
-> Adaptação para Engenho de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
+> Adaptação para NOA Engenharia de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
 
 # SPEC — Parte 1: assistente de IA no ar com CI/CD
 
 > **Status:** rascunho, aguardando aprovação
 > **Projeto:** `agente-personalizado`
 > **Repositório GitHub:** `Nayanearaujo/agente-personalizado`
-> **Space no Hugging Face:** `oaraujo/engenho-de-dados`
+> **Space no Hugging Face:** `oaraujo/noa-engenharia-de-dados`
 > **Origem:** `IDEIA-parte1.md`
 
 Esta spec descreve **o que** será construído e **como saberemos que ficou certo**. O código só é escrito depois que ela for aprovada, uma tarefa por vez (seção 9).
@@ -163,7 +163,7 @@ agente-personalizado/
 # ============================================================
 
 assistente:
-  nome: "Engenho de Dados"
+  nome: "NOA Engenharia de Dados"
   descricao: "Tire suas dúvidas de Engenharia de Dados e Inteligência Artificial."
 
 aparencia:
@@ -351,10 +351,10 @@ Detalhes:
    - `OPENROUTER_API_KEY`
    - `ANTHROPIC_API_KEY`
    - `OPENAI_API_KEY`
-5. Criar um token de acesso: *Settings da conta → Access Tokens → Create new token* → tipo **Fine-grained**, com permissão de **escrita** só no Space `oaraujo/engenho-de-dados`. Copie o token (começa com `hf_`).
+5. Criar um token de acesso: *Settings da conta → Access Tokens → Create new token* → tipo **Fine-grained**, com permissão de **escrita** só no Space `oaraujo/noa-engenharia-de-dados`. Copie o token (começa com `hf_`).
 
 **No GitHub** (repositório `Nayanearaujo/agente-personalizado`)
-6. *Settings → Secrets and variables → Actions → New repository secret* → nome `HF_TOKEN`, valor = token do passo 5. (Opcional: na aba *Variables*, crie `HF_SPACE` para publicar em outro Space; o padrão é `oaraujo/engenho-de-dados`.)
+6. *Settings → Secrets and variables → Actions → New repository secret* → nome `HF_TOKEN`, valor = token do passo 5. (Opcional: na aba *Variables*, crie `HF_SPACE` para publicar em outro Space; o padrão é `oaraujo/noa-engenharia-de-dados`.)
 7. Criar a branch `main` (o repositório começou vazio, sem ela) e defini-la como padrão em *Settings → General → Default branch*. Conferir se o GitHub Actions está habilitado (*Settings → Actions → General*).
 8. **Recomendado:** *Settings → Code security* → ativar **Secret scanning** e **Push protection** (o GitHub bloqueia o push se detectar uma chave). Isso é uma segunda camada além do T8.
 9. **Recomendado:** *Settings → Branches* → regra para `main` exigindo que o check **"testes"** passe antes de fazer merge.
@@ -365,7 +365,7 @@ Detalhes:
 
 ## 8. Critérios de aceite
 
-- [ ] Abro `https://huggingface.co/spaces/oaraujo/engenho-de-dados`, vejo logo, nome e descrição no topo e as cores configuradas no fundo.
+- [ ] Abro `https://huggingface.co/spaces/oaraujo/noa-engenharia-de-dados`, vejo logo, nome e descrição no topo e as cores configuradas no fundo.
 - [ ] Todos os textos da tela estão em português.
 - [ ] Clico em uma pergunta de exemplo e recebo uma resposta didática, aparecendo palavra por palavra.
 - [ ] Com **só uma** das três chaves cadastrada (testar cada uma), o chat funciona.
@@ -407,7 +407,7 @@ Cada tarefa termina com **"como testar"** e só avançamos depois da sua confirm
 | "logo não encontrada" | O nome no `config.yaml` é diferente do arquivo (maiúsculas contam!) | Envie a imagem para `assets/` e copie o nome exato. |
 | Actions bloqueado em "procurar chaves" | Uma chave foi colada em algum arquivo | Apague a chave do arquivo **e revogue-a no provedor** (ela já ficou no histórico do Git). Cadastre uma nova só nos secrets do Space. |
 | Job "publicar" falha com 401/403 | `HF_TOKEN` ausente, expirado ou sem permissão de escrita no Space | Gere um novo token *fine-grained* com escrita no Space e atualize o secret `HF_TOKEN` no GitHub. |
-| Job "publicar" falha com 404 | O Space não existe ou o nome está diferente | Crie o Space `oaraujo/engenho-de-dados` (passo 7.2.2). |
+| Job "publicar" falha com 404 | O Space não existe ou o nome está diferente | Crie o Space `oaraujo/noa-engenharia-de-dados` (passo 7.2.2). |
 | Space em "Build error" | Versão de biblioteca incompatível | Veja a aba *Logs* do Space. Normalmente é versão do Gradio/Python; o T16 existe para evitar isso. |
 | Space em "Runtime error" citando `@spaces.GPU` | Hardware ZeroGPU sem função GPU | Não deve acontecer (RF21); se acontecer, avise na tarefa correspondente. |
 | Não aparece a opção ZeroGPU | Conta sem PRO | Assine o PRO ou use "CPU basic" (o app funciona igual). |

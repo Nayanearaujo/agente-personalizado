@@ -1,4 +1,4 @@
-> Adaptação para Engenho de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
+> Adaptação para NOA Engenharia de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
 
 # Ideia do projeto — Parte 1: meu primeiro assistente de IA no ar
 

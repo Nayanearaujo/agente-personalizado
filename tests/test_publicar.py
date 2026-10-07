@@ -118,9 +118,9 @@ def test_envia_com_os_parametros_certos(monkeypatch):
             chamadas.update(kwargs)
             return SimpleNamespace(oid="novo", commit_url="https://hf/commit/novo")
 
-    commit = publicar.enviar(ApiFalsa(), "oaraujo/engenho-de-dados")
+    commit = publicar.enviar(ApiFalsa(), "oaraujo/noa-engenharia-de-dados")
     assert commit.oid == "novo"
-    assert chamadas["repo_id"] == "oaraujo/engenho-de-dados"
+    assert chamadas["repo_id"] == "oaraujo/noa-engenharia-de-dados"
     assert chamadas["repo_type"] == "space"
     assert chamadas["allow_patterns"] == publicar.ARQUIVOS_DO_APP
     assert chamadas["delete_patterns"] == ["*"]  # remove do Space o que foi apagado no GitHub
@@ -332,5 +332,5 @@ def test_publicacao_completa_com_sucesso(hf, resumo):
     assert hf["api"].enviou is True
     texto = resumo.read_text("utf-8")
     assert "✅ Publicado" in texto
-    assert "https://huggingface.co/spaces/oaraujo/engenho-de-dados" in texto
+    assert "https://huggingface.co/spaces/oaraujo/noa-engenharia-de-dados" in texto
 

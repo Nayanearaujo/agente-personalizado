@@ -1,10 +1,10 @@
-> Adaptação para Engenho de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
+> Adaptação para NOA Engenharia de Dados: tutor de Engenharia de Dados, Estatística e Machine Learning. Nesta versão, somente OpenRouter com modelos :free é habilitado. As alternativas pagas da referência não são habilitadas.
 
 # Teste de aceite — Parte 1
 
 Roteiro para percorrer os critérios de aceite da spec (seção 8). Marque cada item depois de testar.
 
-- **Chat:** https://huggingface.co/spaces/oaraujo/engenho-de-dados
+- **Chat:** https://huggingface.co/spaces/oaraujo/noa-engenharia-de-dados
 - **Execuções do GitHub Actions:** aba **Actions** do repositório → "Testar e publicar"
 - **Onde ver qual IA respondeu:** no Space, aba **Logs**, linhas `Resposta enviada por ...` e `... falhou antes de responder: ...`
 

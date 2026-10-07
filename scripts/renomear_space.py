@@ -9,7 +9,7 @@ from huggingface_hub.errors import HfHubHTTPError
 def main():
     origem = os.environ.get("HF_ORIGEM", "").strip()
     usuario = os.environ.get("HF_USUARIO", "oaraujo").strip() or "oaraujo"
-    destino = f"{usuario}/engenho-de-dados"
+    destino = f"{usuario}/noa-engenharia-de-dados"
     if origem and "/" not in origem:
         origem = f"{usuario}/{origem}"
     api = HfApi(token=os.environ.get("HF_TOKEN"))

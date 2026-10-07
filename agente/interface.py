@@ -21,7 +21,7 @@ from agente.roteador import responder
 TEXTO_PLACEHOLDER = "Digite sua dúvida e pressione Enter…"
 TEXTO_ENVIAR = "Enviar"
 TEXTO_PARAR = "Parar"
-TEXTO_VAZIO = "### Olá, vamos construir conhecimento?\nPergunte sobre pipelines, estatística ou machine learning."
+TEXTO_VAZIO = "### Olá, sou a NOA. Vamos aprender?\nPergunte sobre pipelines, estatística ou machine learning."
 MAX_CONVERSAS_SIMULTANEAS = 10  # RF20: protege contra sobrecarga e gasto excessivo
 
 # RF6: os botões internos do Gradio (Limpar, Tentar novamente...) seguem o idioma
@@ -107,7 +107,7 @@ def montar_cabecalho(config: Config) -> str:
   <img class="cabecalho-logo" src="{logo_em_data_uri(config.logo)}" alt="Logo de {nome}"
        style="height:{config.logo_altura}px">
   <div>
-    <span class="marca-secao">SEU ESPAÇO DE ESTUDO</span>
+    <span class="marca-secao">DADOS, IDEIAS E APRENDIZADO</span>
     <h1 class="cabecalho-nome">{nome}</h1>
     <p class="cabecalho-descricao">{descricao}</p>
   </div>
@@ -197,6 +197,37 @@ footer, footer * {{ color: {texto} !important; }}
 .cartao-chat .input-container {{
   border: 1px solid #D1D5DB; border-radius: 14px; padding: 4px 6px;
 }}
+/* Identidade visual do portfólio NOA. */
+body, gradio-app, .gradio-container, .main, .app {{
+  background: #eef3ee !important;
+  font-family: Inter, system-ui, sans-serif !important;
+}}
+.gradio-container {{ max-width: 1080px !important; padding: 28px 22px !important; }}
+.cabecalho {{
+  background: linear-gradient(145deg, {config.cor_principal} 0%, {config.cor_secundaria} 100%);
+  border-radius: 24px; padding: 30px !important; margin-bottom: 20px;
+  box-shadow: 0 16px 44px -28px rgba(18,51,48,.5);
+}}
+.cabecalho-logo {{ border-radius: 18px; background: #fbf4ee; max-width: 112px; }}
+.cabecalho-nome {{ font-family: Sora, system-ui, sans-serif; font-size: clamp(1.65rem,4vw,2.6rem) !important; }}
+.marca-secao {{ font-family: 'IBM Plex Mono', monospace; color: {texto_descricao}; }}
+.trilhas {{ color: #123330; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }}
+.cartao-chat {{
+  --background-fill-secondary: #f3f6f2;
+  --color-accent-soft: #fbe9ec;
+  border: 1px solid #d7ddd6 !important;
+  box-shadow: 0 20px 50px -30px rgba(18,51,48,.3);
+  padding: 18px !important;
+}}
+.cartao-chat button.example {{ background: #eef3ee !important; border-color: #d7ddd6 !important; }}
+.cartao-chat button.example:hover {{ background: #fbe9ec !important; border-color: {destaque} !important; }}
+.cartao-chat .input-container {{ border-color: #d7ddd6; border-radius: 24px; }}
+footer, footer * {{ color: #5c6b64 !important; }}
+@media (max-width: 600px) {{
+  .gradio-container {{ padding: 12px !important; }}
+  .cabecalho {{ padding: 22px !important; }}
+  .cartao-chat {{ padding: 8px !important; }}
+}}
 """
 
 
@@ -258,6 +289,10 @@ def criar_app(config: Config, provedores: Sequence[Provedor]) -> tuple[gr.Blocks
         "i18n": gr.I18n(
             **{idioma: TEXTOS_INTERNOS_PT for idioma in IDIOMAS_DO_GRADIO}
         ),  # sem links técnicos em inglês no rodapé
-        "head": '<meta name="description" content="' + html.escape(config.descricao) + '">',
+        "head": (
+            '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600'
+            '&family=Sora:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">'
+            '<meta name="description" content="' + html.escape(config.descricao) + '">'
+        ),
     }
     return app, opcoes_launch

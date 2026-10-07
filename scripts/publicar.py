@@ -4,7 +4,7 @@ Usado pelo GitHub Actions (job "publicar"), só depois que todos os testes passa
 
 Variáveis de ambiente:
     HF_TOKEN   token do Hugging Face com permissão de escrita no Space (secret do GitHub)
-    HF_SPACE   nome do Space; padrão: oaraujo/engenho-de-dados
+    HF_SPACE   nome do Space; padrão: oaraujo/noa-engenharia-de-dados
 
 Uso manual (raramente necessário):
     HF_TOKEN=hf_... python scripts/publicar.py              # confere e publica
@@ -21,7 +21,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-SPACE_PADRAO = "oaraujo/engenho-de-dados"
+SPACE_PADRAO = "oaraujo/noa-engenharia-de-dados"
 
 # Só isto vai para o Space (spec, seção 3). Testes, scripts e .github ficam no GitHub.
 ARQUIVOS_DO_APP = ["README.md", "app.py", "config.yaml", "requirements.txt", "assets/*", "agente/*"]
