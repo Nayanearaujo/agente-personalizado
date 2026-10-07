@@ -42,7 +42,15 @@ def traduzir(erro: BaseException, tempo_limite: int | None = None, chaves: tuple
     elif status == 403:
         motivo = "chave sem permissão para este modelo (403)"
     elif status == 404:
-        motivo = "modelo não encontrado: confira o ID no config.yaml (404)"
+        if "data policy" in texto or "privacy" in texto:
+            motivo = (
+                "as regras de privacidade da conta não permitem os provedores disponíveis para este modelo (404); "
+                "confira Settings > Privacy no OpenRouter"
+            )
+        elif "no endpoints" in texto or "no available provider" in texto:
+            motivo = "nenhum provedor disponível para este modelo neste momento (404)"
+        else:
+            motivo = "modelo não encontrado: confira o ID no config.yaml (404)"
     elif status == 429:
         motivo = "limite de uso atingido; tente mais tarde (429)"
     elif status == 529 or "overloaded" in texto:
@@ -64,4 +72,3 @@ def recusou_parametro(erro: BaseException, parametro: str) -> bool:
     Ex.: modelos mais novos não aceitam 'temperature'.
     """
     return getattr(erro, "status_code", None) == 400 and parametro in _mensagem_original(erro)
-
