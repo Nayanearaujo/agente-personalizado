@@ -1,8 +1,23 @@
-.venv/
-venv/
-__pycache__/
-*.pyc
+# Chaves e variáveis locais: NUNCA versionar
 .env
 .env.*
-*.log
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Gradio
+.gradio/
+flagged/
+
+# Sistema
 .DS_Store
+Thumbs.db
+
+
+.ambiente/

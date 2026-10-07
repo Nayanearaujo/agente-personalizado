@@ -1,119 +1,47 @@
-"""Agente educativo de Estatística e Machine Learning com OpenRouter."""
-import html
-import os
-from pathlib import Path
+"""Ponto de entrada do Space: lê o config.yaml, monta a fila de IAs e abre o chat.
 
-import gradio as gr
-from openai import OpenAI
-from validacao import carregar_config
+Rodar no computador:
+    python app.py      (depois abra http://127.0.0.1:7860)
+"""
 
-RAIZ = Path(__file__).resolve().parent
-CONFIG = carregar_config(RAIZ / "config.yaml")
+import spaces  # precisa vir primeiro no hardware ZeroGPU
 
-# O chat usa uma API externa. Esta função registra o suporte ao ZeroGPU
-# exigido pelo ambiente da aula e não é chamada nas conversas.
-if os.environ.get("SPACE_ID"):
-    import spaces
+import logging
+import sys
 
-    @spaces.GPU
-    def _reserva_gpu():
-        return None
+from agente.config import ErroConfig, carregar_config, validar_modo_gratuito
+from agente.interface import criar_app
+from agente.provedores import criar_provedores
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+log = logging.getLogger("agente")
 
 
+@spaces.GPU
+def exigencia_zerogpu() -> None:
+    """RF21: a ZeroGPU exige ao menos uma função com @spaces.GPU para iniciar.
 
-def mensagem_erro(erro):
-    codigo = getattr(erro, "status_code", None)
-    return {
-        401: "A chave do OpenRouter é inválida. Confira a configuração.",
-        402: "O modelo exige créditos. Escolha um modelo gratuito na configuração.",
-        403: "O provedor recusou o acesso. Confira as permissões no OpenRouter.",
-        429: "O limite de uso foi atingido. Aguarde e tente novamente.",
-    }.get(codigo, "Não foi possível consultar o modelo. Tente novamente em alguns instantes.")
-
-
-def responder(mensagem, historico):
-    chave = os.environ.get("OPENROUTER_API_KEY", "").strip()
-    if not chave:
-        yield "A chave do OpenRouter ainda não foi configurada. Cadastre OPENROUTER_API_KEY no ambiente."
-        return
-    mensagens = [{"role": "system", "content": CONFIG["prompt_sistema"]}]
-    for item in historico:
-        if item.get("role") in ("user", "assistant") and isinstance(item.get("content"), str):
-            mensagens.append({"role": item["role"], "content": item["content"]})
-    mensagens.append({"role": "user", "content": mensagem})
-    modelos = list(dict.fromkeys([CONFIG["modelo"], "apodex/apodex-1.1-mini:free"]))
-    if any(not modelo.endswith(":free") for modelo in modelos):
-        yield "Use somente modelos gratuitos terminados em :free na configuração."
-        return
-    for indice, modelo in enumerate(modelos):
-        resposta = ""
-        fluxo = None
-        try:
-            with OpenAI(base_url="https://openrouter.ai/api/v1", api_key=chave,
-                        timeout=60.0, max_retries=0) as cliente:
-                fluxo = cliente.chat.completions.create(
-                    model=modelo, messages=mensagens,
-                    max_tokens=CONFIG["max_tokens"], stream=True,
-                )
-                for evento in fluxo:
-                    if evento.choices:
-                        trecho = evento.choices[0].delta.content
-                        if trecho:
-                            resposta += trecho
-                            yield resposta
-                if not resposta:
-                    yield "O modelo não retornou uma resposta. Tente novamente."
-            return
-        except Exception as erro:
-            codigo = getattr(erro, "status_code", None)
-            print(f"Modelo {modelo}: HTTP {codigo}", flush=True)
-            if not resposta and codigo in (404, 429, 500, 502, 503, 504) and indice + 1 < len(modelos):
-                continue
-            aviso = mensagem_erro(erro)
-            yield (resposta + "\n\nA resposta foi interrompida. " + aviso) if resposta else aviso
-            return
-        finally:
-            if fluxo is not None:
-                fluxo.close()
-
-
-def criar_interface():
-    logo = CONFIG["logo"]
-    if not logo.startswith("https://"):
-        logo = "/gradio_api/file=" + str((RAIZ / logo).resolve())
-    css = f"""
-    .gradio-container {{background: #f3f5f3 !important; max-width: 1050px !important;}}
-    #cabecalho {{background: {CONFIG['cor_principal']}; color: white; padding: 24px;
-      border-radius: 16px; margin-bottom: 16px;}}
-    #cabecalho h1, #cabecalho p {{color: white; margin: 0;}}
-    #cabecalho img {{float: left; margin-right: 18px;}}
-    #enviar {{background: {CONFIG['cor_secundaria']} !important; color: white !important;}}
+    Nada aqui usa GPU: as IAs rodam nos provedores externos. Esta função
+    nunca é chamada, então não gasta a sua cota de GPU. Fora da ZeroGPU,
+    o decorador não faz nada.
     """
-    with gr.Blocks(title=CONFIG["nome"], css=css, analytics_enabled=False) as pagina:
-        gr.HTML(
-            f'<header id="cabecalho"><img src="{html.escape(logo, quote=True)}" '
-            f'width="{CONFIG["logo_tamanho"]}" height="{CONFIG["logo_tamanho"]}" alt="Logo">'
-            f'<h1>{html.escape(CONFIG["nome"])}</h1><p>{html.escape(CONFIG["descricao"])}</p></header>'
-        )
-        gr.Markdown("Conteúdo educativo. Use exemplos fictícios e não envie dados pessoais ou sigilosos.")
-        conversa = gr.Chatbot(type="messages", label="Conversa", height=420)
-        entrada = gr.Textbox(placeholder="Escreva sua dúvida sobre estatística ou machine learning", label="Sua pergunta")
-        enviar = gr.Button("Enviar", variant="primary", elem_id="enviar")
-        parar = gr.Button("Parar resposta", variant="stop", visible=False)
-        chat = gr.ChatInterface(
-            responder, type="messages", chatbot=conversa, textbox=entrada,
-            examples=CONFIG["exemplos"], submit_btn=enviar, stop_btn=parar,
-            flagging_mode="never", save_history=False,
-        )
-        limpar = gr.Button("Limpar conversa")
-        limpar.click(lambda: ([], "", [], []),
-                     outputs=[conversa, entrada, chat.chatbot_state, chat.chatbot_value], queue=False)
-    return pagina
 
+
+try:
+    config = carregar_config()
+    validar_modo_gratuito(config)
+except ErroConfig as erro:
+    # RF1: configuração inválida -> o app não sobe e explica o que corrigir.
+    print("O config.yaml tem problemas:\n" + "\n".join(erro.erros), file=sys.stderr)
+    sys.exit(1)
+
+provedores = criar_provedores(config)
+if provedores:
+    log.info("Fila de provedores: %s", " → ".join(f"{p.nome} ({p.modelo})" for p in provedores))
+else:
+    log.warning("Nenhuma chave de IA cadastrada: o chat vai explicar como cadastrar.")
+
+demo, opcoes_launch = criar_app(config, provedores)
 
 if __name__ == "__main__":
-    criar_interface().queue().launch(
-        server_name=os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0" if os.environ.get("SPACE_ID") else "127.0.0.1"),
-        server_port=int(os.environ.get("PORT", "7860")),
-        allowed_paths=[str(RAIZ / CONFIG["logo"])], share=False, ssr_mode=False,
-    )
+    demo.launch(**opcoes_launch)

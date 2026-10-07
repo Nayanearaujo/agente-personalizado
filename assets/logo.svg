@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="titulo">
-  <title id="titulo">Logo Aprendendo Dados</title>
-  <rect width="96" height="96" rx="22" fill="#142C40"/>
-  <path d="M48 15 75 26v21c0 17-12 28-27 35-15-7-27-18-27-35V26Z" fill="#096B66" stroke="#9DE4D9" stroke-width="2"/>
-  <path d="M34 57V46m14 11V36m14 21V42" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Engenho de Dados"><rect width="80" height="80" rx="22" fill="#E6F1EC"/><path d="M20 22h24v10H20zM36 35h24v10H36zM20 48h24v10H20z" fill="#146C5C"/><path d="M44 27h14v13M36 40H24v13" fill="none" stroke="#122B3B" stroke-width="4" stroke-linejoin="round"/><circle cx="58" cy="40" r="4" fill="#C98945"/><circle cx="24" cy="53" r="4" fill="#C98945"/></svg>

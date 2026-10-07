@@ -1,84 +1,73 @@
 ---
-title: Aprendendo Dados
-emoji: 📊
+title: Engenho de Dados
+emoji: 📐
 colorFrom: blue
 colorTo: green
 sdk: gradio
-sdk_version: 5.49.1
-app_file: app.py
+sdk_version: 6.28.0
 python_version: "3.12"
+app_file: app.py
+short_description: Engenharia de Dados, estatística e machine learning
 pinned: false
 ---
 
-# Aprendendo Dados
+# Engenho de Dados
 
-Agente de IA personalizado que explica estatística e machine learning com exemplos práticos e exercícios, passo a passo. Nesta etapa, responde pelo OpenRouter. A consulta aos documentos será acrescentada na Parte 2.
+Um espaço para aprender Engenharia de Dados, estatística e machine learning em português. O assistente explica ideias, resolve exemplos com dados fictícios e ajuda a construir conhecimento, uma etapa por vez.
+
+A estrutura foi adaptada do [projeto da aula](https://github.com/azrosolucoestecnologicas/agente-personalizado). O modelo principal é `google/gemma-4-31b-it:free`, no OpenRouter. O app recusa configurações com modelos pagos. O serviço gratuito continua sujeito a limites e disponibilidade.
+
+## Personalizar
+
+Edite `config.yaml` no GitHub e faça commit na `main`. Nome, cores, logo, instruções, exemplos e parâmetros ficam nesse arquivo. A logo fica em `assets/logo.svg`. A publicação só começa depois que as verificações passam.
+
+## Chaves
+
+No Hugging Face, abra **Settings > Variables and secrets > New secret** e cadastre `OPENROUTER_API_KEY`. No GitHub, cadastre `HF_TOKEN` em **Settings > Secrets and variables > Actions > Secrets**, com escrita no seu Space. Não coloque chaves nos arquivos do projeto.
+
+As variáveis `HF_USUARIO` e `HF_SPACE` do GitHub identificam o destino da publicação. O workflow tenta renomear o Space existente para `engenho-de-dados`. Se o token não permitir, publica no endereço anterior e registra um aviso no Summary. Depois de uma renomeação bem-sucedida, atualize `HF_SPACE` para `engenho-de-dados`.
 
 ## Rodar no computador
 
-Instale Python 3.11 ou 3.12. Baixe este repositório em **Code > Download ZIP**, extraia e abra o terminal na pasta que contém app.py.
-
-### macOS ou Linux
+Use Python 3.12 e abra o terminal dentro da pasta que contém `app.py`.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements-local.txt
-python testes.py
-python iniciar.py
+python -m pip install -r requirements-dev.txt
+python scripts/perguntar.py --help
+python app.py
 ```
 
-### Windows, usando PowerShell
+No Windows, ative com `.venv\Scripts\Activate.ps1`. Configure `OPENROUTER_API_KEY` no ambiente antes de abrir o chat. Acesse http://127.0.0.1:7860. O chat abre sem chave, mas explica que ela precisa ser cadastrada para responder.
 
-```powershell
-py -3 -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements-local.txt
-.venv\Scripts\python.exe testes.py
-.venv\Scripts\python.exe iniciar.py
-```
-
-O iniciador solicita sua chave do OpenRouter de forma oculta. Ela fica no ambiente do processo e não é salva em arquivo. Abra **http://localhost:7860**. Para encerrar, use Ctrl+C no terminal. Se a chave já estiver na variável OPENROUTER_API_KEY, também pode executar python app.py.
-
-## Personalização
-
-Edite config.yaml para alterar nome, descrição, cores, logo, modelo, limite de resposta, instruções e perguntas. Cores devem estar entre aspas. O modelo inicial google/gemma-4-31b-it:free usa um modelo gratuito específico, sujeito a limites e disponibilidade.
-
-## Verificações
+## Verificar antes de publicar
 
 ```bash
-python testes.py
-python -m unittest test_comportamento.py
+python scripts/validar_config.py
+python scripts/procurar_chaves.py
+python -m pytest -q
+ruff check .
 ```
 
-O portão confere T1 a T9. Os testes de conversa usam simulações e não gastam créditos. Uma conversa real exige sua chave e acesso ao OpenRouter.
+Os testes usam provedores simulados e não gastam créditos. Eles conferem a configuração, as mensagens, o histórico, a troca de provedor, os erros, a interface e a publicação. O app usa a estrutura de provedores da referência, mas esta configuração habilita somente OpenRouter gratuito.
 
-## Publicar no Hugging Face
+## Arquivos
 
-Space criado: https://huggingface.co/spaces/oaraujo/chargeback-intelligence, com SDK Gradio e ZeroGPU confirmado pela tela de configurações. O app registra uma função com @spaces.GPU, conforme o exemplo da aula, sem solicitar GPU nas conversas. A geração de respostas acontece no OpenRouter.
+| Caminho | Função |
+| --- | --- |
+| `config.yaml` | Personalização do assistente |
+| `app.py` | Inicialização e proteção contra modelos pagos |
+| `agente/` | Configuração, interface, provedores, roteamento e erros |
+| `assets/` | Logo |
+| `scripts/` | Validação, busca de chaves, teste e publicação |
+| `tests/` | Testes automáticos |
+| `.github/workflows/` | Portão e publicação automática |
 
-Para concluir a publicação:
+## Se uma consulta falhar
 
-1. Use o Space oaraujo/chargeback-intelligence com SDK Gradio e hardware ZeroGPU.
-2. Em Settings do Space, cadastre OPENROUTER_API_KEY como **secret**.
-3. No GitHub, em Settings > Secrets and variables > Actions, cadastre HF_TOKEN como **secret**, com permissão de escrita no Space.
-4. Na aba Variables do mesmo painel, cadastre PUBLICAR_SPACE com valor true. HF_USUARIO e HF_SPACE têm padrões oaraujo e chargeback-intelligence; use variáveis com esses nomes se precisar alterar.
-5. Na aba Actions, execute o workflow **Testar e publicar**.
-6. Confira os jobs, o build do Space e o estado Running. Abra a URL e teste uma conversa.
+O chat mostra o provedor, o modelo e a causa, sem mostrar a chave. `401` indica chave inválida; `404` indica modelo ou rota indisponível; `429` indica limite de uso. Um erro de conexão é diferente de um modelo inexistente. Criar outra chave ou retirar o limite de gasto não garante a resolução dessas falhas.
 
-Sem PUBLICAR_SPACE=true, somente os testes rodam. Não coloque chaves no código, no config ou no HTML. A publicação usa Git com histórico completo, como no exemplo da aula, e substitui a main do Space com a main deste projeto. Não edite código separadamente no Space.
+## Próxima etapa
 
-## Testar o bloqueio
-
-Troque temporariamente cor_principal por "#FFD966" e faça commit. O teste de contraste deve falhar e o job publicar não deve começar. Restaure "#142C40" em seguida.
-
-## Próxima aula
-
-Prepare de 3 a 5 documentos públicos sobre estatística e machine learning em Markdown, sem dados pessoais ou sigilosos. Crie sua conta no Supabase. O banco, a indexação e a busca documental serão implementados na Parte 2.
-
-## Referência da aula
-
-Referência: https://github.com/azrosolucoestecnologicas/agente-personalizado e apostila da Parte 1. Especialidade: Estatística e Machine Learning. A logo fica em assets/logo.svg. O modelo principal é google/gemma-4-31b-it:free. O SSR experimental do Gradio fica desativado.
-
-## Alternativa gratuita
-
-O Gemma é tentado primeiro. Quando ocorre uma falha elegível antes da resposta, o assistente tenta apodex/apodex-1.1-mini:free. O código aceita somente identificadores terminados em :free. Nenhuma chave adicional é necessária. Limites da conta ou indisponibilidade de ambos os modelos ainda podem impedir uma resposta.
+A Parte 1 publica e testa o assistente. A consulta aos documentos com RAG, Supabase e fontes será implementada na Parte 2. Por enquanto, o assistente não consulta apostilas nem executa código.

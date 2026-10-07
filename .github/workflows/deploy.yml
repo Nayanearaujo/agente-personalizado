@@ -1,69 +1,121 @@
+# Portão de testes + publicação no Hugging Face Spaces.
+#
+# - Em QUALQUER branch e em pull requests: roda todas as verificações.
+# - Só em push na branch main: se tudo passar, publica no Space.
+# Se algo falhar, nada é publicado e o site antigo continua no ar.
+# O que corrigir aparece na execução → aba "Summary".
+
 name: Testar e publicar
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+  pull_request:
+  workflow_dispatch: # botão "Run workflow" na aba Actions
 
 permissions:
   contents: read
 
-concurrency:
-  group: publicacao-main
-  cancel-in-progress: false
-
 jobs:
-  testar:
+  testes:
+    name: testes
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Baixar o código
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # histórico completo, para procurar chaves em commits antigos
+
+      - name: Instalar Python 3.12 (mesma versão do Space)
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
-      - name: Instalar dependências
-        run: python -m pip install -r requirements-local.txt
-      - name: Rodar o portão T1 a T9
-        run: python testes.py
-      - name: Conferir comportamento sem chamar o modelo
-        run: python -m unittest test_comportamento.py
+          cache-dependency-path: requirements*.txt
 
-  publicar:
-    needs: testar
-    if: ${{ vars.PUBLICAR_SPACE == 'true' }}
+      - name: Instalar bibliotecas
+        run: pip install -r requirements-dev.txt
+
+      # "!cancelled()" faz as verificações seguintes rodarem mesmo se uma
+      # anterior falhar, para você ver TODOS os problemas de uma vez.
+      - name: "T1–T7: conferir o config.yaml"
+        run: python scripts/validar_config.py
+
+      - name: "T8: procurar chaves de API no código"
+        if: ${{ !cancelled() }}
+        run: python scripts/procurar_chaves.py
+
+      - name: "T8: procurar chaves no histórico do Git"
+        if: ${{ !cancelled() }}
+        run: python scripts/procurar_chaves.py --historico
+
+      - name: "T17: estilo do código (ruff)"
+        if: ${{ !cancelled() }}
+        run: ruff check . --output-format=github
+
+      - name: "T1–T17: testes automáticos"
+        if: ${{ !cancelled() }}
+        run: python -m pytest -q
+
+  # Botão "Run workflow" fora da main: só CONFERE a configuração do
+  # Hugging Face (Space, token, hardware, secrets). Não publica nada.
+  conferir:
+    name: conferir configuração
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-    env:
-      HF_USUARIO: ${{ vars.HF_USUARIO || 'oaraujo' }}
-      HF_SPACE: ${{ vars.HF_SPACE || 'chargeback-intelligence' }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar Python 3.12
+        uses: actions/setup-python@v6
         with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Enviar ao Space
+          python-version: "3.12"
+
+      - name: Instalar a biblioteca do Hugging Face
+        run: pip install "huggingface_hub==1.33.0"
+
+      - name: Conferir Space, token, hardware e secrets
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "$HF_TOKEN" ]; then
-            echo "Cadastre HF_TOKEN nos secrets do repositório."
-            exit 1
-          fi
-          if [[ ! "$HF_USUARIO" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || [[ ! "$HF_SPACE" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]]; then
-            echo "Confira HF_USUARIO e HF_SPACE."
-            exit 1
-          fi
-          ASKPASS_FILE=$(mktemp)
-          trap 'rm -f "$ASKPASS_FILE"' EXIT
-          cat > "$ASKPASS_FILE" <<'SCRIPT'
-          #!/bin/sh
-          case "$1" in
-            *Username*) printf '%s\n' "$HF_USUARIO" ;;
-            *Password*) printf '%s\n' "$HF_TOKEN" ;;
-          esac
-          SCRIPT
-          chmod 700 "$ASKPASS_FILE"
-          export GIT_ASKPASS="$ASKPASS_FILE"
-          export GIT_TERMINAL_PROMPT=0
-          git push --force "https://huggingface.co/spaces/${HF_USUARIO}/${HF_SPACE}" HEAD:main
+          HF_SPACE: ${{ env.HF_SPACE }}
+        run: python scripts/publicar.py --conferir
+
+  publicar:
+    name: publicar
+    needs: testes
+    # Só publica a partir da main (push ou botão manual), nunca em pull requests.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # Uma publicação por vez; se vierem duas seguidas, a segunda espera.
+    concurrency:
+      group: publicar-space
+      cancel-in-progress: false
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar a biblioteca do Hugging Face
+        run: pip install "huggingface_hub==1.33.0"
+
+      - name: Atualizar o nome do Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USUARIO: ${{ vars.HF_USUARIO || 'oaraujo' }}
+          HF_ORIGEM: ${{ vars.HF_SPACE }}
+        run: python scripts/renomear_space.py
+
+      - name: Enviar para o Space e acompanhar o build
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          # Opcional: crie a variável HF_SPACE no GitHub para usar outro Space.
+          HF_SPACE: ${{ env.HF_SPACE }}
+        run: python scripts/publicar.py
+
