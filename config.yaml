@@ -7,7 +7,7 @@ aparencia:
   cor_secundaria: "#0F2B28"
   cor_destaque: "#EC8098"
   logo: "assets/logo.png"
-  logo_altura: 96
+  logo_altura: 56
 ia:
   provedores:
     - nome: openrouter

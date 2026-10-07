@@ -228,12 +228,38 @@ footer, footer * {{ color: #5c6b64 !important; }}
   .cabecalho {{ padding: 22px !important; }}
   .cartao-chat {{ padding: 8px !important; }}
 }}
+/* Tela compacta: mantém cabeçalho e entrada próximos da conversa. */
+html, body {{ margin: 0; width: 100%; overflow-x: hidden; }}
+gradio-app, .gradio-container {{ width: 100% !important; box-sizing: border-box; }}
+.gradio-container {{ max-width: 960px !important; padding: 12px 16px !important; font-size: 15px !important; }}
+.cabecalho {{ gap: 12px; padding: 14px 18px !important; margin-bottom: 8px; border-radius: 16px; }}
+.cabecalho > div {{ min-width: 0; }}
+.cabecalho-logo {{ display: block !important; width: 56px; max-width: 56px; flex: 0 0 56px; border-radius: 10px; }}
+.cabecalho-nome {{ font-size: 24px !important; line-height: 1.2; letter-spacing: -.02em; overflow-wrap: anywhere; }}
+.cabecalho-descricao {{ font-size: 14px !important; line-height: 1.45; margin-top: 4px; }}
+.marca-secao {{ font-size: 10px; letter-spacing: .1em; }}
+.trilhas {{ font-size: 10px; padding: 0 4px 6px; line-height: 1.5; letter-spacing: .04em; }}
+.cartao-chat {{ padding: 8px !important; border-radius: 16px !important; --chatbot-text-size: 15px; }}
+.cartao-chat .prose, .cartao-chat .prose p, .cartao-chat textarea,
+.cartao-chat button.example, .cartao-chat button.example * {{ font-size: 15px !important; line-height: 1.5; }}
+.cartao-chat .prose h1, .cartao-chat .prose h2, .cartao-chat .prose h3 {{ font-size: 18px !important; line-height: 1.35; }}
+.cartao-chat button.example {{ padding: 8px 12px !important; border-radius: 10px !important; }}
+.cartao-chat button.submit-button, .cartao-chat button.stop-button {{ font-size: 14px !important; padding: 6px 14px !important; }}
+.cartao-chat .input-container {{ padding: 2px 4px; border-radius: 16px; }}
+@media (max-width: 600px) {{
+  .gradio-container {{ padding: 8px !important; }}
+  .cabecalho {{ flex-direction: row; text-align: left; padding: 12px !important; gap: 10px; }}
+  .cabecalho-nome {{ font-size: 20px !important; }}
+  .cabecalho-descricao {{ font-size: 12px !important; }}
+  .marca-secao {{ font-size: 9px; }}
+  .cartao-chat {{ padding: 6px !important; }}
+}}
 """
 
 
 def tema(config: Config) -> gr.themes.Base:
     destaque = config.cor_destaque or config.cor_principal
-    return gr.themes.Soft().set(
+    return gr.themes.Soft(text_size="sm").set(
         button_primary_background_fill=destaque,
         button_primary_background_fill_hover=config.cor_principal,
         button_primary_text_color=cor_do_texto(destaque),
@@ -260,13 +286,13 @@ def criar_app(config: Config, provedores: Sequence[Provedor]) -> tuple[gr.Blocks
                     placeholder=TEXTO_VAZIO,
                     show_label=False,
                     buttons=["copy"],
-                    height="60vh",
+                    height="min(42vh, 320px)",
                 ),
                 textbox=gr.Textbox(
                     placeholder=TEXTO_PLACEHOLDER,
                     show_label=False,
                     max_length=config.max_caracteres_pergunta,
-                    autofocus=True,
+                    autofocus=False,
                     submit_btn=TEXTO_ENVIAR,
                     stop_btn=TEXTO_PARAR,  # aparece só enquanto a IA responde
                 ),
@@ -275,7 +301,7 @@ def criar_app(config: Config, provedores: Sequence[Provedor]) -> tuple[gr.Blocks
                 cache_examples=False,  # nunca chamar a IA na inicialização
                 concurrency_limit=MAX_CONVERSAS_SIMULTANEAS,
                 api_visibility="private",  # só pela tela, não por chamadas diretas à API
-                autofocus=True,
+                autofocus=False,
             )
 
     app.chat = chat  # referência usada nos testes
