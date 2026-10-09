@@ -8,9 +8,9 @@ import yaml
 from agente.config import ARQUIVO_PADRAO, RAIZ_PROJETO, carregar_config, validar
 
 
-def test_base_desativada_enquanto_indexacao_nao_esta_pronta():
+def test_base_ativada_com_parametros_da_aula():
     base = carregar_config().base_conhecimento
-    assert base.ativa is False
+    assert base.ativa is True
     assert base.tamanho_trecho == 1200
     assert base.sobreposicao == 150
 

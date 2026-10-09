@@ -7,4 +7,6 @@ openai==3.19.2
 # 'spaces' fica sem versão: no hardware ZeroGPU o Hugging Face já traz a
 # versão certa, e fixar outra poderia atrapalhar.
 spaces
+fastembed==0.8.1
+supabase==2.32.0
 

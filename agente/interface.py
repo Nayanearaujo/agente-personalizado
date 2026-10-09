@@ -15,7 +15,7 @@ import gradio as gr
 
 from agente.config import Config
 from agente.provedores import Provedor
-from agente.roteador import responder
+from agente.consulta import conversar_com_base
 
 # Textos fixos da tela (tudo em português).
 TEXTO_PLACEHOLDER = "Digite sua dúvida e pressione Enter…"
@@ -274,7 +274,7 @@ def criar_app(config: Config, provedores: Sequence[Provedor]) -> tuple[gr.Blocks
     """Monta a tela. Devolve o app e as opções para o `launch()`."""
 
     def conversar(mensagem: str, historico: list[dict]) -> Iterator[str]:
-        yield from responder(mensagem, historico, config, provedores)
+        yield from conversar_com_base(mensagem, historico, config, provedores)
 
     with gr.Blocks(title=config.nome) as app:
         gr.HTML(montar_cabecalho(config))

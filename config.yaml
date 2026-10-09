@@ -39,7 +39,7 @@ exemplos:
 
 # Ativar somente depois de implementar e avaliar a indexação.
 base_conhecimento:
-  ativa: false
+  ativa: true
   pasta: documentos
   modelo_embedding: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
   tamanho_trecho: 1200

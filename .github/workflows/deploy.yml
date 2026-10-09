@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: noa-rag-publicar
+  cancel-in-progress: false
+
 jobs:
   testes:
     name: testes
@@ -74,7 +78,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar a biblioteca do Hugging Face
-        run: pip install "huggingface_hub==1.33.0"
+        run: pip install "huggingface_hub==1.33.0" -r requirements-indexacao.txt
 
       - name: Conferir Space, token, hardware e secrets
         env:
@@ -82,9 +86,30 @@ jobs:
           HF_SPACE: ${{ env.HF_SPACE }}
         run: python scripts/publicar.py --conferir
 
+  avaliar:
+    needs: testes
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-indexacao.txt -r requirements.txt
+      - name: Indexar teste e avaliar a mesma versão
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          python scripts/indexar.py
+          python scripts/avaliar.py
+
   publicar:
     name: publicar
-    needs: testes
+    needs: [testes, avaliar]
     # Só publica a partir da main (push ou botão manual), nunca em pull requests.
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -103,7 +128,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar a biblioteca do Hugging Face
-        run: pip install "huggingface_hub==1.33.0"
+        run: pip install "huggingface_hub==1.33.0" -r requirements-indexacao.txt
 
       - name: Atualizar o nome do Space
         env:
@@ -112,9 +137,23 @@ jobs:
           HF_ORIGEM: ${{ vars.HF_SPACE || 'engenho-de-dados' }}
         run: python scripts/renomear_space.py
 
+      - name: Promover índice aprovado
+        id: promover
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/promover.py
+
       - name: Enviar para o Space e acompanhar o build
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           # Opcional: crie a variável HF_SPACE no GitHub para usar outro Space.
           HF_SPACE: ${{ env.HF_SPACE }}
         run: python scripts/publicar.py
+
+      - name: Restaurar índice se a publicação falhar
+        if: failure() && steps.promover.outcome == 'success'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/promover.py --restaurar

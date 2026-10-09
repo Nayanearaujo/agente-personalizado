@@ -12,6 +12,7 @@ from dataclasses import dataclass
 # (descrição, expressão regular). A ordem importa: os formatos mais
 # específicos vêm antes do genérico "sk-".
 PADROES_CHAVE: list[tuple[str, re.Pattern[str]]] = [
+    ("chave secreta do Supabase", re.compile(r"sb_secret_[A-Za-z0-9_\-]{16,}")),
     ("chave do OpenRouter", re.compile(r"sk-or-[A-Za-z0-9_\-]{20,}")),
     ("chave da Anthropic", re.compile(r"sk-ant-[A-Za-z0-9_\-]{20,}")),
     ("chave da OpenAI", re.compile(r"sk-(?:proj|svcacct|admin)-[A-Za-z0-9_\-]{20,}")),
