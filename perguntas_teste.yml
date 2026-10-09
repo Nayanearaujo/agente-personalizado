@@ -1,0 +1,27 @@
+top_k: 3
+limiar_hit_rate: 0.85
+perguntas:
+  - pergunta: Onde devo guardar as chaves de API do assistente?
+    fonte_esperada: parte1-cicd-deploy.md
+    secao_esperada: '09 Segredos: onde fica cada chave'
+  - pergunta: O que acontece com a máquina do GitHub Actions quando o workflow termina?
+    fonte_esperada: parte1-cicd-deploy.md
+    secao_esperada: '08 GitHub Actions: a máquina descartável'
+  - pergunta: Por que a conversa some quando fecho a página do chat?
+    fonte_esperada: parte1-cicd-deploy.md
+    secao_esperada: 14 Por que o chat esquece
+  - pergunta: Qual a diferença entre site estático, PaaS e servidor próprio?
+    fonte_esperada: parte1-cicd-deploy.md
+    secao_esperada: 04 Tipos de deploy
+  - pergunta: Como o RRF combina os resultados da busca por palavras e por sentido?
+    fonte_esperada: parte2-rag.md
+    secao_esperada: 12 Recuperação híbrida e RRF
+  - pergunta: Para que serve a sobreposição entre trechos no chunking?
+    fonte_esperada: parte2-rag.md
+    secao_esperada: '09 Chunking: dividir para achar'
+  - pergunta: O que mede o ângulo entre dois vetores?
+    fonte_esperada: parte2-rag.md
+    secao_esperada: '06 Como medir proximidade: produto escalar e cosseno'
+  - pergunta: Quando vale a pena usar um banco vetorial?
+    fonte_esperada: parte2-rag.md
+    secao_esperada: 08 Índice, indexação e banco vetorial

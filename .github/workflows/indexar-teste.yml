@@ -7,6 +7,8 @@ on:
       - documentos/**
       - agente/rag.py
       - scripts/indexar.py
+      - scripts/avaliar.py
+      - perguntas_teste.yml
       - requirements-indexacao.txt
       - .github/workflows/indexar-teste.yml
 permissions:
@@ -37,3 +39,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: python scripts/indexar.py
+      - name: Avaliar busca sem alterar produção
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/avaliar.py
