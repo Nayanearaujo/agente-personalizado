@@ -12,16 +12,17 @@ from agente.config import carregar_config  # noqa: E402
 from agente.rag import Trecho, carregar_trechos  # noqa: E402
 
 
-def ajustar_tokens(trechos, contar, limite=128):
+def ajustar_tokens(trechos, contar, limite=128, incluir_secao=False):
     """Subdivide preservando todo o texto, sem truncamento silencioso."""
     from hashlib import sha256
 
     saida = []
     for trecho in trechos:
+        contexto = f"Seção: {trecho.secao}\n" if incluir_secao else ""
         pendentes = [trecho.conteudo]
         while pendentes:
             texto = pendentes.pop(0)
-            if contar(texto) > limite:
+            if contar(contexto + texto) > limite:
                 if len(texto) < 2:
                     raise ValueError("Um trecho não cabe no limite de tokens do modelo.")
                 meio = len(texto) // 2
@@ -30,7 +31,7 @@ def ajustar_tokens(trechos, contar, limite=128):
             chave = f"{trecho.id}\0{len(saida)}\0{texto}"
             saida.append(Trecho(
                 "teste:" + sha256(chave.encode()).hexdigest(),
-                trecho.fonte, trecho.secao, texto, len(saida),
+                trecho.fonte, trecho.secao, contexto + texto, len(saida),
             ))
     return saida
 
@@ -73,7 +74,9 @@ def main():
         tokenizer = Tokenizer.from_str(modelo.model.tokenizer.to_str())
         tokenizer.no_truncation()
         tokenizer.no_padding()
-        trechos = ajustar_tokens(trechos, lambda t: len(tokenizer.encode(t).ids))
+        trechos = ajustar_tokens(
+            trechos, lambda t: len(tokenizer.encode(t).ids), incluir_secao=True,
+        )
         linhas = preparar_linhas(
             trechos, modelo.embed([t.conteudo for t in trechos], batch_size=16), versao,
         )
