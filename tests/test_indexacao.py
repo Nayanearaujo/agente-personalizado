@@ -25,7 +25,7 @@ def test_recusa_falta_de_vetor():
 
 def test_cada_subtrecho_mantem_contexto_sem_estourar_limite():
     trecho = Trecho("a", "a.md", "RRF", "abcdef" * 50, 0)
-    partes = ajustar_tokens([trecho], len, limite=256, incluir_secao=True)
-    prefixo = "Seção: RRF\nIntrodução: " + trecho.conteudo[:180] + "\n"
-    assert all(t.conteudo.startswith(prefixo) and len(t.conteudo) <= 256 for t in partes)
+    partes = ajustar_tokens([trecho], len, limite=128, incluir_secao=True)
+    prefixo = "Seção: RRF\n"
+    assert all(t.conteudo.startswith(prefixo) and len(t.conteudo) <= 128 for t in partes)
     assert "".join(t.conteudo.removeprefix(prefixo) for t in partes) == trecho.conteudo

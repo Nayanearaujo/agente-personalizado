@@ -68,6 +68,15 @@ def main():
             primeiro = resultados[0] if resultados else None
             fonte = f"{primeiro['fonte']} / {primeiro['secao']}" if primeiro else "nenhum resultado"
             print(f"{'OK' if posicao else 'ERRO'} posição={posicao}: {pergunta['pergunta']} | primeiro: {fonte}")
+            if posicao is None:
+                diagnostico = banco.rpc("buscar_hibrido", {
+                    "p_texto": pergunta["pergunta"], "p_vetor": vetor,
+                    "p_colecao": "teste", "p_k": 10,
+                    "p_peso_palavras": config.peso_palavras,
+                    "p_peso_sentido": config.peso_sentido, "p_sim_min": 0,
+                }).execute().data
+                for i, candidato in enumerate(diagnostico, 1):
+                    print(f"Diagnóstico sem filtro {i}: {candidato['fonte']} / {candidato['secao']}")
         hit, mrr = calcular_metricas(posicoes)
         resumo = f"Hit rate@{k}: {hit:.3f} (mínimo {limiar}); MRR@{k}: {mrr:.3f}"
         print(resumo)
