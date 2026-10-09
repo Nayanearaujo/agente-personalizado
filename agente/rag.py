@@ -8,6 +8,12 @@ import re
 from agente.config import BaseConhecimento
 
 
+def termos_lexicais(pergunta: str) -> str:
+    """Siglas explícitas são âncoras lexicais; sem siglas, usa a pergunta inteira."""
+    siglas = re.findall(r"\b[A-Z][A-Z0-9]{1,}\b", pergunta)
+    return " ".join(dict.fromkeys(siglas)) if siglas else pergunta
+
+
 @dataclass(frozen=True)
 class Trecho:
     id: str

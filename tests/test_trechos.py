@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from agente.config import BaseConhecimento
-from agente.rag import carregar_trechos, dividir_documento
+from agente.rag import carregar_trechos, dividir_documento, termos_lexicais
 
 
 def test_sobreposicao_limite_e_ids_estaveis():
@@ -37,3 +37,8 @@ def test_recusa_arquivo_que_nao_e_markdown(tmp_path):
     (pasta / "a.pdf").write_bytes(b"PDF")
     with pytest.raises(ValueError, match="Markdown"):
         carregar_trechos(tmp_path, BaseConhecimento())
+
+
+def test_lexical_prioriza_sigla_sem_mudar_pergunta_sem_siglas():
+    assert termos_lexicais("Como funciona RRF no RAG? RRF?") == "RRF RAG"
+    assert termos_lexicais("O que é sobreposição?") == "O que é sobreposição?"

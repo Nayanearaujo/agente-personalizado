@@ -10,7 +10,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
 from agente.config import carregar_config  # noqa: E402
-from agente.rag import carregar_trechos  # noqa: E402
+from agente.rag import carregar_trechos, termos_lexicais  # noqa: E402
 
 
 def calcular_metricas(posicoes):
@@ -55,7 +55,7 @@ def main():
         for pergunta in perguntas:
             vetor = next(modelo.embed([pergunta["pergunta"]])).tolist()
             resultados = banco.rpc("buscar_hibrido", {
-                "p_texto": pergunta["pergunta"], "p_vetor": vetor,
+                "p_texto": termos_lexicais(pergunta["pergunta"]), "p_vetor": vetor,
                 "p_colecao": "teste", "p_k": k,
                 "p_peso_palavras": config.peso_palavras,
                 "p_peso_sentido": config.peso_sentido,
@@ -70,7 +70,7 @@ def main():
             print(f"{'OK' if posicao else 'ERRO'} posição={posicao}: {pergunta['pergunta']} | primeiro: {fonte}")
             if posicao is None:
                 diagnostico = banco.rpc("buscar_hibrido", {
-                    "p_texto": pergunta["pergunta"], "p_vetor": vetor,
+                    "p_texto": termos_lexicais(pergunta["pergunta"]), "p_vetor": vetor,
                     "p_colecao": "teste", "p_k": 10,
                     "p_peso_palavras": config.peso_palavras,
                     "p_peso_sentido": config.peso_sentido, "p_sim_min": 0,
