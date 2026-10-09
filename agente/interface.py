@@ -21,7 +21,7 @@ from agente.consulta import conversar_com_base
 TEXTO_PLACEHOLDER = "Digite sua dúvida e pressione Enter…"
 TEXTO_ENVIAR = "Enviar"
 TEXTO_PARAR = "Parar"
-TEXTO_VAZIO = "### Olá, sou a NOA. Vamos aprender?\nPergunte sobre pipelines, estatística ou machine learning."
+TEXTO_VAZIO = "### Olá, sou a NOA. Vamos aprender?\nPergunte sobre CI/CD, RAG e embeddings nas apostilas do curso."
 MAX_CONVERSAS_SIMULTANEAS = 10  # RF20: protege contra sobrecarga e gasto excessivo
 
 # RF6: os botões internos do Gradio (Limpar, Tentar novamente...) seguem o idioma

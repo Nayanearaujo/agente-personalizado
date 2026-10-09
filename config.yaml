@@ -32,12 +32,12 @@ comportamento:
     documentos: nesta etapa você não tem ferramentas nem busca documental.
     Se não souber, diga isso. Recuse com educação assuntos fora de dados e IA.
 exemplos:
-  - "Como montar meu primeiro pipeline de dados?"
-  - "Qual a diferença entre ETL e ELT?"
-  - "Explique média, mediana e desvio padrão com um exemplo."
-  - "Como evitar vazamento de dados em machine learning?"
+  - "Como funciona a busca híbrida com RRF?"
+  - "Para que serve a sobreposição entre trechos?"
+  - "O que mede a similaridade do cosseno?"
+  - "Por que o assistente não lembra conversas anteriores?"
 
-# Ativar somente depois de implementar e avaliar a indexação.
+# Base avaliada antes da publicação pelo GitHub Actions.
 base_conhecimento:
   ativa: true
   pasta: documentos
