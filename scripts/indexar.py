@@ -17,8 +17,16 @@ def ajustar_tokens(trechos, contar, limite=128, incluir_secao=False):
     from hashlib import sha256
 
     saida = []
+    introducoes = {}
     for trecho in trechos:
-        contexto = f"Seção: {trecho.secao}\n" if incluir_secao else ""
+        chave_secao = (trecho.fonte, trecho.secao)
+        if chave_secao not in introducoes:
+            introducoes[chave_secao] = trecho.conteudo[:180].replace("\n", " ")
+    for trecho in trechos:
+        contexto = (
+            f"Seção: {trecho.secao}\nIntrodução: {introducoes[(trecho.fonte, trecho.secao)]}\n"
+            if incluir_secao else ""
+        )
         pendentes = [trecho.conteudo]
         while pendentes:
             texto = pendentes.pop(0)
