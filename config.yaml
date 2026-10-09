@@ -36,3 +36,16 @@ exemplos:
   - "Qual a diferença entre ETL e ELT?"
   - "Explique média, mediana e desvio padrão com um exemplo."
   - "Como evitar vazamento de dados em machine learning?"
+
+# Ativar somente depois de implementar e avaliar a indexação.
+base_conhecimento:
+  ativa: false
+  pasta: documentos
+  modelo_embedding: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+  tamanho_trecho: 1200
+  sobreposicao: 150
+  trechos_por_resposta: 4
+  peso_palavras: 1
+  peso_sentido: 1
+  similaridade_minima: 0.5
+  mensagem_nao_encontrado: "Não encontrei isso no material do curso."

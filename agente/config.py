@@ -7,6 +7,7 @@ qual campo, o que está errado e como corrigir.
 from __future__ import annotations
 
 import difflib
+import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -25,6 +26,8 @@ PASTA_LOGO = "assets"
 TAMANHO_MAX_LOGO = 1024 * 1024  # 1 MB
 
 PADRAO_COR = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
+MODELO_EMBEDDING = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+MENSAGEM_NAO_ENCONTRADO = "Não encontrei isso no material do curso."
 
 # Estrutura esperada: nome do campo -> subcampos (dict) ou None (valor final).
 ESTRUTURA: dict[str, Any] = {
@@ -46,6 +49,13 @@ ESTRUTURA: dict[str, Any] = {
     },
     "comportamento": {"instrucoes": None},
     "exemplos": None,
+    "base_conhecimento": {
+        campo: None for campo in (
+            "ativa", "pasta", "modelo_embedding", "tamanho_trecho", "sobreposicao",
+            "trechos_por_resposta", "peso_palavras", "peso_sentido",
+            "similaridade_minima", "mensagem_nao_encontrado",
+        )
+    },
 }
 CAMPOS_PROVEDOR = ("nome", "modelo")
 
@@ -65,6 +75,20 @@ class Provedor:
 
 
 @dataclass(frozen=True)
+class BaseConhecimento:
+    ativa: bool = False
+    pasta: str = "documentos"
+    modelo_embedding: str = MODELO_EMBEDDING
+    tamanho_trecho: int = 1200
+    sobreposicao: int = 150
+    trechos_por_resposta: int = 4
+    peso_palavras: float = 1
+    peso_sentido: float = 1
+    similaridade_minima: float = 0.5
+    mensagem_nao_encontrado: str = MENSAGEM_NAO_ENCONTRADO
+
+
+@dataclass(frozen=True)
 class Config:
     nome: str
     descricao: str
@@ -81,6 +105,7 @@ class Config:
     instrucoes: str
     exemplos: list[str] = field(default_factory=list)
     cor_destaque: str = ""  # botões e detalhes; vazio = usa a cor_principal
+    base_conhecimento: BaseConhecimento = field(default_factory=BaseConhecimento)
 
 
 def validar_modo_gratuito(config: Config) -> None:
@@ -165,6 +190,7 @@ def validar(dados: Any, raiz: Path) -> list[str]:
     erros: list[str] = []
     erros += _campos_desconhecidos(dados, ESTRUTURA, "")
     erros += _chaves_no_config(dados, "")
+    erros += _validar_base(dados, raiz)
 
     assistente = _secao(dados, "assistente", erros)
     aparencia = _secao(dados, "aparencia", erros)
@@ -195,6 +221,46 @@ def validar(dados: Any, raiz: Path) -> list[str]:
 
     # exemplos
     _exemplos(dados, erros)
+    return erros
+
+
+def _validar_base(dados: dict, raiz: Path) -> list[str]:
+    if "base_conhecimento" not in dados:
+        return []
+    b = dados["base_conhecimento"]
+    if not isinstance(b, dict):
+        return ["❌ `base_conhecimento`: use campos recuados abaixo desta seção."]
+    erros: list[str] = []
+    if "ativa" in b and not isinstance(b["ativa"], bool):
+        erros.append("❌ `base_conhecimento.ativa`: use true ou false, sem aspas.")
+    for campo, minimo, maximo in (
+        ("tamanho_trecho", 200, 2000), ("sobreposicao", 0, 1999),
+        ("trechos_por_resposta", 1, 10),
+    ):
+        _inteiro(b, f"base_conhecimento.{campo}", minimo, maximo, erros)
+        if campo in b and b[campo] is None:
+            erros.append(f"❌ `base_conhecimento.{campo}`: não pode ser vazio.")
+    for campo, maximo in (("peso_palavras", 10), ("peso_sentido", 10), ("similaridade_minima", 1)):
+        _numero(b, f"base_conhecimento.{campo}", 0, maximo, erros)
+        v = b.get(campo, 1)
+        if v is None or (isinstance(v, (int, float)) and not math.isfinite(v)):
+            erros.append(f"❌ `base_conhecimento.{campo}`: use um número finito.")
+    tamanho, overlap = b.get("tamanho_trecho", 1200), b.get("sobreposicao", 150)
+    if _eh_inteiro(tamanho) and _eh_inteiro(overlap) and overlap >= tamanho:
+        erros.append("❌ `base_conhecimento.sobreposicao`: deve ser menor que tamanho_trecho.")
+    if b.get("peso_palavras", 1) == 0 and b.get("peso_sentido", 1) == 0:
+        erros.append("❌ `base_conhecimento`: pelo menos um peso deve ser maior que zero.")
+    for campo, esperado in (("modelo_embedding", MODELO_EMBEDDING),
+                            ("mensagem_nao_encontrado", MENSAGEM_NAO_ENCONTRADO)):
+        if b.get(campo, esperado) != esperado:
+            erros.append(f"❌ `base_conhecimento.{campo}`: use exatamente {esperado!r}.")
+    pasta = b.get("pasta", "documentos")
+    if not isinstance(pasta, str) or not pasta.strip():
+        erros.append("❌ `base_conhecimento.pasta`: informe um caminho relativo dentro do projeto.")
+    else:
+        p = Path(pasta)
+        if p.is_absolute() or ".." in p.parts or not (raiz / p).resolve().is_relative_to(raiz.resolve()):
+            erros.append("❌ `base_conhecimento.pasta`: o caminho não pode sair do projeto.")
     return erros
 
 
@@ -429,4 +495,5 @@ def _montar(dados: dict, raiz: Path) -> Config:
         ),
         instrucoes=c["instrucoes"].strip(),
         exemplos=[e.strip() for e in dados.get("exemplos") or []],
+        base_conhecimento=BaseConhecimento(**dados.get("base_conhecimento", {})),
     )
