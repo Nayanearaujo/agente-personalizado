@@ -62,7 +62,8 @@ def test_verificacoes_rodam_mesmo_se_uma_anterior_falhar(workflow):
 
 def test_publicar_so_depois_dos_testes_e_so_na_main(workflow):
     job = workflow["jobs"]["publicar"]
-    assert job["needs"] == "testes"
+    assert set(job["needs"]) == {"testes", "avaliar"}
+    assert workflow["jobs"]["avaliar"]["needs"] == "testes"
     assert "refs/heads/main" in job["if"]
     assert "pull_request" in job["if"]
     assert job["concurrency"]["cancel-in-progress"] is False

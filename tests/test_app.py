@@ -35,7 +35,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 
 @pytest.fixture(scope="module")
 def config():
-    return carregar_config()
+    atual = carregar_config()
+    # Estes cenários verificam o contrato original da Parte 1, sem consulta externa.
+    return replace(atual, base_conhecimento=replace(atual.base_conhecimento, ativa=False))
 
 
 def _componentes(app: gr.Blocks, tipo):
