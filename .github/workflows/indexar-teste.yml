@@ -1,0 +1,39 @@
+name: Preparar índice de teste
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - documentos/**
+      - agente/rag.py
+      - scripts/indexar.py
+      - requirements-indexacao.txt
+      - .github/workflows/indexar-teste.yml
+permissions:
+  contents: read
+concurrency:
+  group: preparar-indice-teste
+  cancel-in-progress: false
+jobs:
+  indexar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Instalar e testar
+        run: |
+          pip install -r requirements-dev.txt -r requirements-indexacao.txt
+          python scripts/validar_config.py
+          python scripts/procurar_chaves.py
+          ruff check .
+          python -m pytest -q
+      - name: Gerar vetores e gravar somente teste
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python scripts/indexar.py

@@ -1,0 +1,3 @@
+# Usadas pelo Actions para preparar a coleção de teste.
+fastembed==0.8.1
+supabase==2.32.0
