@@ -33,10 +33,10 @@ passos para resolver um problema. Pense numa receita de bolo: os ingredientes s�
 modo de preparo é o processamento e o bolo pronto é a saída. Todo algoritmo tem essas três
 partes.
 Exemplo: calcular a média das notas de um aluno. Em português, os passos são:
-## 1. Receber as notas do aluno (entrada)
-## 2. Somar as notas (processamento)
-## 3. Dividir a soma pela quantidade (processamento)
-## 4. Mostrar a média (saída)
+1. Receber as notas do aluno (entrada)
+2. Somar as notas (processamento)
+3. Dividir a soma pela quantidade (processamento)
+4. Mostrar a média (saída)
 Agora o mesmo algoritmo em Python, em três células, um passo de cada vez.
 Passo 1: guardar as notas. A linha abaixo cria uma lista, que é um conjunto de valores entre
 colchetes separados por vírgula. O nome notas passa a se referir a essa lista. Atenção: os números
@@ -120,15 +120,15 @@ sem instalar nada prototipação
 
 (cid:127) Paleta de comandos: Ctrl+Shift+P. Quase tudo no VS Code é acessível digitando aqui.
 ### 3.3 Montando o ambiente passo a passo
-## 1. Instale o Python 3.11 ou superior (python.org). No Windows, marque a opção Add Python to
+1. Instale o Python 3.11 ou superior (python.org). No Windows, marque a opção Add Python to
 PATH.
-## 2. Instale o VS Code (code.visualstudio.com).
-## 3. Instale as extensões Python e Jupyter (ambas da Microsoft) na aba Extensions.
-## 4. Crie uma pasta para o projeto e abra com File > Open Folder.
-## 5. Crie um ambiente virtual no terminal (comandos abaixo). O terminal é a janela onde
+2. Instale o VS Code (code.visualstudio.com).
+3. Instale as extensões Python e Jupyter (ambas da Microsoft) na aba Extensions.
+4. Crie uma pasta para o projeto e abra com File > Open Folder.
+5. Crie um ambiente virtual no terminal (comandos abaixo). O terminal é a janela onde
 digitamos comandos em texto.
-## 6. Selecione o interpretador: Ctrl+Shift+P, depois Python: Select Interpreter, e escolha o .venv.
-## 7. Crie um arquivo .py ou .ipynb e execute.
+6. Selecione o interpretador: Ctrl+Shift+P, depois Python: Select Interpreter, e escolha o .venv.
+7. Crie um arquivo .py ou .ipynb e execute.
 # criar o ambiente virtual (dentro da pasta do projeto)
 python -m venv .venv
 # ativar no Windows (PowerShell)
@@ -168,10 +168,10 @@ testar e agendar.
 Para conhecer uma linguagem, os profissionais costumam classificá-la respondendo algumas
 perguntas. Neste módulo respondemos cada uma para o Python, uma de cada vez, partindo do
 zero:
-## 1. É de alto ou de baixo nível?
-## 2. É compilada ou interpretada?
-## 3. Tem tipagem dinâmica ou estática? Forte ou fraca?
-## 4. É imperativa ou declarativa?
+1. É de alto ou de baixo nível?
+2. É compilada ou interpretada?
+3. Tem tipagem dinâmica ou estática? Forte ou fraca?
+4. É imperativa ou declarativa?
 ### 4.1 Alto nível ou baixo nível?
 Primeiro, um conceito: a memória. Quando o computador trabalha, guarda os dados
 temporariamente na memória (a RAM). Imagine uma enorme estante com milhões de gavetas
@@ -274,11 +274,11 @@ Leia em português: “some o valor, da tabela vendas, onde o valor for maior qu
 dissemos como percorrer a tabela nem em que ordem. O banco de dados decide.
 Estilo imperativo, em Python. Aqui escrevemos a receita. Em português, seria:
 
-## 1. Comece com total igual a zero
-## 2. Para cada valor da lista
+1. Comece com total igual a zero
+2. Para cada valor da lista
 3. se o valor for maior que 100
 4. some o valor ao total
-## 5. No fim, mostre o total
+5. No fim, mostre o total
 Primeiro, guardamos a lista de valores:
 valores = [50, 120, 300, 80, 150]
 Agora a receita em código. Você ainda não estudou for e if (são da Parte 2), então não precisa
@@ -811,7 +811,7 @@ maior = max(valores)
 menor = min(valores)
 print(round(total, 2), round(ticket_medio, 2), maior, menor)
 SAÍDA
-### 11319.8 1886.63 5200.0 79.9
+11319.8 1886.63 5200.0 79.9
 Passo 4: o relatório
 O formato numérico padrão do Python usa vírgula para milhar e ponto para decimal (11,319.80).
 Para o padrão brasileiro (11.319,80), trocamos os símbolos. Como vamos repetir isso várias vezes,
