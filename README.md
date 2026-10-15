@@ -71,3 +71,7 @@ O chat mostra o provedor, o modelo e a causa, sem mostrar a chave. `401` indica 
 ## Próxima etapa
 
 A Parte 1 publica e testa o assistente. A consulta aos documentos com RAG, Supabase e fontes será implementada na Parte 2. Por enquanto, o assistente não consulta apostilas nem executa código.
+
+## Aulas e etapas do projeto
+
+[Consulte os materiais, o andamento de cada etapa e o roteiro para a próxima aula](aulas/README.md).
