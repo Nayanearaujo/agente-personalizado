@@ -93,6 +93,36 @@ jobs:
       - name: "T20: nenhuma chave no front-end compilado"
         run: python scripts/procurar_chaves.py
 
+  imagem:
+    name: imagem
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: "T22: montar a imagem Docker"
+        run: docker build -t noa:teste .
+
+      - name: "T22: subir o contêiner e conferir as rotas"
+        run: |
+          docker run -d --name noa -p 7860:7860 noa:teste
+          # Dá tempo de o servidor subir e carregar o modelo.
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:7860/api/config >/dev/null; then break; fi
+            sleep 3
+          done
+          echo "== /api/config =="
+          curl -s http://localhost:7860/api/config | head -c 400
+          echo
+          echo "== /api/saude (503 esperado sem Supabase) =="
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:7860/api/saude)
+          echo "status=$codigo"
+          test "$codigo" = "503" || test "$codigo" = "200"
+          echo "== / (interface) =="
+          curl -sf http://localhost:7860/ | grep -qi "<div id=\"root\"" && echo "interface ok"
+          docker rm -f noa
+
   # Botão "Run workflow" fora da main: só CONFERE a configuração do
   # Hugging Face (Space, token, hardware, secrets). Não publica nada.
   conferir:
