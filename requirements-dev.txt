@@ -1,6 +1,7 @@
-# Bibliotecas usadas só nos testes (não vão para o Space).
+# Bibliotecas usadas só nos testes (não vão para a imagem do servidor).
 -r requirements.txt
 pytest==9.1.1
 ruff==0.15.8
 huggingface_hub==1.33.0   # mesma versão usada no job "publicar" do GitHub Actions
-
+# Parte 3: cliente de teste da API (o TestClient do FastAPI usa httpx).
+httpx==0.28.1

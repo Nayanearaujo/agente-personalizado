@@ -1,5 +1,6 @@
-# Bibliotecas do app. Versões fixas para o build do Space ser previsível.
+# Bibliotecas do app. Versões fixas para o build ser previsível.
 # A versão do gradio precisa ser igual à 'sdk_version' do README.md.
+# (O gradio sai na Tarefa 6, quando o servidor FastAPI assume de vez.)
 gradio==6.28.0
 PyYAML==6.0.2
 anthropic==1.8.0
@@ -9,4 +10,7 @@ openai==3.19.2
 spaces
 fastembed==0.8.1
 supabase==2.32.0
-
+# Parte 3: servidor FastAPI (substitui o Gradio como porta de entrada).
+fastapi==0.115.5
+uvicorn==0.32.1
+pydantic==2.9.2
