@@ -23,9 +23,13 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 SPACE_PADRAO = "oaraujo/noa-engenharia-de-dados"
 
-# Só isto vai para o Space (spec, seção 3). Testes, scripts e .github ficam no GitHub.
-ARQUIVOS_DO_APP = ["README.md", "app.py", "config.yaml", "requirements.txt", "assets/*", "agente/*"]
-IGNORAR = ["*__pycache__*", "*.pyc", ".DS_Store"]
+# Vai para o Space (tipo Docker): o Dockerfile monta a imagem com o servidor
+# FastAPI e a interface React. Testes, scripts e .github ficam no GitHub.
+ARQUIVOS_DO_APP = [
+    "README.md", "Dockerfile", ".dockerignore", "config.yaml", "requirements.txt",
+    "assets/*", "agente/*", "frontend/*",
+]
+IGNORAR = ["*__pycache__*", "*.pyc", ".DS_Store", "frontend/node_modules/*", "frontend/dist/*"]
 
 ESTAGIOS_OK = {"RUNNING"}
 ESTAGIOS_ERRO = {"BUILD_ERROR", "RUNTIME_ERROR", "CONFIG_ERROR", "NO_APP_FILE"}
@@ -141,20 +145,17 @@ def conferir(api, space: str) -> tuple[list[str], list[str], list[str]]:
         return [_explicar_erro_http(erro, space)], avisos, ok
 
     info = api.space_info(space)
-    if info.sdk == "gradio":
-        ok.append("SDK do Space: Gradio")
+    if info.sdk == "docker":
+        ok.append("SDK do Space: Docker")
     else:
-        erros.append(f"O Space foi criado com o SDK '{info.sdk}'. Ele precisa ser Gradio: crie o Space de novo.")
+        erros.append(
+            f"O Space está com o SDK '{info.sdk}'. A Parte 3 precisa de Docker: "
+            "em Settings → mude o SDK para Docker (ou recrie o Space como Docker)."
+        )
 
     runtime = getattr(info, "runtime", None)
     hardware = str(getattr(runtime, "requested_hardware", None) or getattr(runtime, "hardware", None) or "")
-    if "zero" in hardware:
-        ok.append(f"Hardware: ZeroGPU ({hardware})")
-    else:
-        avisos.append(
-            f"Hardware atual: '{hardware or 'ainda não definido'}'. Para ZeroGPU: Settings → Space hardware "
-            "(exige conta PRO). O app funciona igual em CPU."
-        )
+    ok.append(f"Hardware: {hardware or 'CPU básico (gratuito)'}")  # Docker roda em CPU; o modelo é leve
 
     try:
         secrets = set(api.get_space_secrets(space))

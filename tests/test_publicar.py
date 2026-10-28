@@ -106,11 +106,14 @@ def test_versao_do_huggingface_hub_igual_no_ci_e_nos_testes(workflow):
 
 def test_envia_so_os_arquivos_do_app():
     arquivos = publicar.arquivos_para_publicar()
-    for essencial in ("README.md", "app.py", "config.yaml", "requirements.txt", "agente/roteador.py"):
+    for essencial in ("README.md", "Dockerfile", "config.yaml", "requirements.txt", "agente/roteador.py"):
         assert essencial in arquivos
     assert any(a.startswith("assets/") for a in arquivos)
+    assert any(a.startswith("frontend/") for a in arquivos)  # a interface React vai junto
     for proibido in ("tests/", "scripts/", ".github/", "SPEC-", "IDEIA-", "requirements-dev", "__pycache__", ".env"):
         assert not any(proibido in a for a in arquivos), f"não deveria publicar {proibido}"
+    # O código do Gradio não existe mais.
+    assert not any(a == "app.py" for a in arquivos)
 
 
 def test_envia_com_os_parametros_certos(monkeypatch):
@@ -197,8 +200,8 @@ class HfFalso:
     def __init__(
         self,
         erro_acesso=None,
-        sdk="gradio",
-        hardware="zero-a10g",
+        sdk="docker",
+        hardware="cpu-basic",
         secrets=("OPENROUTER_API_KEY",),
         variaveis=(),
         erro_envio=None,
@@ -241,7 +244,7 @@ def test_conferencia_tudo_certo():
     erros, avisos, ok = publicar.conferir(HfFalso(), "u/s")
     assert erros == [] and avisos == []
     assert any("permissão de escrita" in item for item in ok)
-    assert any("ZeroGPU" in item for item in ok)
+    assert any("Docker" in item for item in ok)
     assert any("OPENROUTER_API_KEY" in item for item in ok)
 
 
@@ -261,13 +264,13 @@ def test_conferencia_space_inexistente():
 
 
 def test_conferencia_sdk_errado():
-    erros, _, _ = publicar.conferir(HfFalso(sdk="docker"), "u/s")
-    assert "precisa ser Gradio" in erros[0]
+    erros, _, _ = publicar.conferir(HfFalso(sdk="gradio"), "u/s")
+    assert "precisa de Docker" in erros[0]
 
 
-def test_conferencia_sem_zerogpu_e_so_aviso():
-    erros, avisos, _ = publicar.conferir(HfFalso(hardware="cpu-basic"), "u/s")
-    assert erros == [] and "cpu-basic" in avisos[0]
+def test_conferencia_informa_o_hardware():
+    erros, _, ok = publicar.conferir(HfFalso(hardware="cpu-basic"), "u/s")
+    assert erros == [] and any("cpu-basic" in item for item in ok)
 
 
 def test_conferencia_sem_chave_de_ia_e_so_aviso():
