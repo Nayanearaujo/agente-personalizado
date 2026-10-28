@@ -266,9 +266,11 @@ def test_conferencia_space_inexistente():
     assert "`fulano/x` não encontrado" in erros[0]
 
 
-def test_conferencia_sdk_errado():
-    erros, _, _ = publicar.conferir(HfFalso(sdk="gradio"), "u/s")
-    assert "precisa de Docker" in erros[0]
+def test_conferencia_sdk_gradio_vira_docker_e_so_aviso():
+    # SDK gradio não bloqueia: o envio do README (sdk: docker) reconfigura o Space.
+    erros, avisos, _ = publicar.conferir(HfFalso(sdk="gradio"), "u/s")
+    assert erros == []
+    assert any("passa a Docker" in a for a in avisos)
 
 
 def test_conferencia_informa_o_hardware():
@@ -321,7 +323,8 @@ def test_so_conferir_nao_envia_nada(hf, resumo):
 
 
 def test_configuracao_com_erro_nao_publica(hf, resumo):
-    hf["api"] = HfFalso(sdk="static")
+    # Chave de IA exposta como VARIABLE é erro bloqueante: não publica.
+    hf["api"] = HfFalso(secrets=(), variaveis=("OPENAI_API_KEY",))
     assert publicar.main([]) == 1
     assert hf["api"].enviou is False
     assert "nada foi publicado" in resumo.read_text("utf-8")

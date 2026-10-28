@@ -148,9 +148,11 @@ def conferir(api, space: str) -> tuple[list[str], list[str], list[str]]:
     if info.sdk == "docker":
         ok.append("SDK do Space: Docker")
     else:
-        erros.append(
-            f"O Space está com o SDK '{info.sdk}'. A Parte 3 precisa de Docker: "
-            "em Settings → mude o SDK para Docker (ou recrie o Space como Docker)."
+        # Não bloqueia: ao enviar o README novo (sdk: docker), o Space se
+        # reconfigura como Docker. Seria um impasse barrar aqui.
+        avisos.append(
+            f"O Space ainda está com SDK '{info.sdk}'. Ao enviar o README (sdk: docker), "
+            "ele passa a Docker. Confira o build no Hugging Face depois da publicação."
         )
 
     runtime = getattr(info, "runtime", None)
