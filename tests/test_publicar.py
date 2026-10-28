@@ -63,7 +63,8 @@ def test_verificacoes_rodam_mesmo_se_uma_anterior_falhar(workflow):
 def test_publicar_so_depois_dos_testes_e_so_na_main(workflow):
     job = workflow["jobs"]["publicar"]
     assert set(job["needs"]) == {"testes", "avaliar"}
-    assert workflow["jobs"]["avaliar"]["needs"] == "testes"
+    # Na Parte 3, o avaliar só roda depois dos três portões (Python, interface e imagem).
+    assert set(workflow["jobs"]["avaliar"]["needs"]) == {"testes", "interface", "imagem"}
     assert "refs/heads/main" in job["if"]
     assert "pull_request" in job["if"]
     assert job["concurrency"]["cancel-in-progress"] is False
@@ -83,14 +84,16 @@ def test_token_vem_do_secret_e_nao_do_codigo(workflow):
     assert workflow["permissions"] == {"contents": "read"}
 
 
-def test_python_do_ci_igual_ao_do_space(workflow):
-    cabecalho = yaml.safe_load(re.match(r"^---\n(.*?)\n---\n", (RAIZ / "README.md").read_text("utf-8"), re.S)[1])
+def test_python_do_ci_igual_ao_da_imagem(workflow):
+    # A versão do Python do CI tem que ser a mesma que a imagem Docker usa.
+    dockerfile = (RAIZ / "Dockerfile").read_text("utf-8")
+    versao_imagem = re.search(r"FROM python:(\d+\.\d+)", dockerfile)[1]
     for job in workflow["jobs"].values():
         versoes = [p["with"]["python-version"] for p in job["steps"] if "setup-python" in p.get("uses", "")]
         # Jobs que não usam Python (ex.: o job "interface", em Node) são ignorados.
         if not versoes:
             continue
-        assert versoes == [str(cabecalho["python_version"])]
+        assert versoes == [versao_imagem]
 
 
 def test_versao_do_huggingface_hub_igual_no_ci_e_nos_testes(workflow):
@@ -106,11 +109,14 @@ def test_versao_do_huggingface_hub_igual_no_ci_e_nos_testes(workflow):
 
 def test_envia_so_os_arquivos_do_app():
     arquivos = publicar.arquivos_para_publicar()
-    for essencial in ("README.md", "app.py", "config.yaml", "requirements.txt", "agente/roteador.py"):
+    for essencial in ("README.md", "Dockerfile", "config.yaml", "requirements.txt", "agente/roteador.py"):
         assert essencial in arquivos
     assert any(a.startswith("assets/") for a in arquivos)
+    assert any(a.startswith("frontend/") for a in arquivos)  # a interface React vai junto
     for proibido in ("tests/", "scripts/", ".github/", "SPEC-", "IDEIA-", "requirements-dev", "__pycache__", ".env"):
         assert not any(proibido in a for a in arquivos), f"não deveria publicar {proibido}"
+    # O código do Gradio não existe mais.
+    assert not any(a == "app.py" for a in arquivos)
 
 
 def test_envia_com_os_parametros_certos(monkeypatch):
@@ -197,8 +203,8 @@ class HfFalso:
     def __init__(
         self,
         erro_acesso=None,
-        sdk="gradio",
-        hardware="zero-a10g",
+        sdk="docker",
+        hardware="cpu-basic",
         secrets=("OPENROUTER_API_KEY",),
         variaveis=(),
         erro_envio=None,
@@ -241,7 +247,7 @@ def test_conferencia_tudo_certo():
     erros, avisos, ok = publicar.conferir(HfFalso(), "u/s")
     assert erros == [] and avisos == []
     assert any("permissão de escrita" in item for item in ok)
-    assert any("ZeroGPU" in item for item in ok)
+    assert any("Docker" in item for item in ok)
     assert any("OPENROUTER_API_KEY" in item for item in ok)
 
 
@@ -260,14 +266,16 @@ def test_conferencia_space_inexistente():
     assert "`fulano/x` não encontrado" in erros[0]
 
 
-def test_conferencia_sdk_errado():
-    erros, _, _ = publicar.conferir(HfFalso(sdk="docker"), "u/s")
-    assert "precisa ser Gradio" in erros[0]
+def test_conferencia_sdk_gradio_vira_docker_e_so_aviso():
+    # SDK gradio não bloqueia: o envio do README (sdk: docker) reconfigura o Space.
+    erros, avisos, _ = publicar.conferir(HfFalso(sdk="gradio"), "u/s")
+    assert erros == []
+    assert any("passa a Docker" in a for a in avisos)
 
 
-def test_conferencia_sem_zerogpu_e_so_aviso():
-    erros, avisos, _ = publicar.conferir(HfFalso(hardware="cpu-basic"), "u/s")
-    assert erros == [] and "cpu-basic" in avisos[0]
+def test_conferencia_informa_o_hardware():
+    erros, _, ok = publicar.conferir(HfFalso(hardware="cpu-basic"), "u/s")
+    assert erros == [] and any("cpu-basic" in item for item in ok)
 
 
 def test_conferencia_sem_chave_de_ia_e_so_aviso():
@@ -315,7 +323,8 @@ def test_so_conferir_nao_envia_nada(hf, resumo):
 
 
 def test_configuracao_com_erro_nao_publica(hf, resumo):
-    hf["api"] = HfFalso(sdk="static")
+    # Chave de IA exposta como VARIABLE é erro bloqueante: não publica.
+    hf["api"] = HfFalso(secrets=(), variaveis=("OPENAI_API_KEY",))
     assert publicar.main([]) == 1
     assert hf["api"].enviou is False
     assert "nada foi publicado" in resumo.read_text("utf-8")

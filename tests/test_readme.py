@@ -28,8 +28,7 @@ CAMPOS_ACEITOS = {
     "custom_headers", "license", "preload_from_hub",
 }  # fmt: skip
 CORES_ACEITAS = {"red", "yellow", "green", "blue", "indigo", "purple", "pink", "gray"}
-PYTHON_ZEROGPU = ("3.10", "3.12")
-SEM_VERSAO_FIXA = {"spaces"}  # o Hugging Face fornece a versão certa na ZeroGPU
+SEM_VERSAO_FIXA: set[str] = set()  # no Docker, todas as libs têm versão fixa
 NOME_NO_PIP = {"yaml": "pyyaml"}  # import -> nome do pacote
 # Bibliotecas usadas SÓ na indexação (GitHub Actions), nunca no servidor publicado.
 # pymupdf4llm é AGPL e fica em requirements-indexacao.txt de propósito.
@@ -62,7 +61,7 @@ def ler_requisitos() -> dict[str, str | None]:
 
 def test_t16_cabecalho_tem_os_campos_essenciais():
     cabecalho = ler_cabecalho()
-    for campo in ("title", "emoji", "sdk", "sdk_version", "python_version", "app_file"):
+    for campo in ("title", "emoji", "sdk", "app_port"):
         assert cabecalho.get(campo), f"Campo '{campo}' ausente no cabeçalho do README.md"
 
 
@@ -71,31 +70,23 @@ def test_t16_sem_campos_desconhecidos():
     assert not desconhecidos, f"Campos que o Hugging Face não reconhece: {desconhecidos}"
 
 
-def test_t16_sdk_gradio_e_app_file_existe():
+def test_t16_sdk_docker_e_dockerfile_existe():
     cabecalho = ler_cabecalho()
-    assert cabecalho["sdk"] == "gradio", "A ZeroGPU só funciona com sdk: gradio"
-    assert (RAIZ / cabecalho["app_file"]).is_file(), f"app_file '{cabecalho['app_file']}' não existe"
+    assert cabecalho["sdk"] == "docker", "O Space agora é um contêiner: sdk: docker"
+    assert (RAIZ / "Dockerfile").is_file(), "O Dockerfile precisa existir na raiz"
 
 
-def test_t16_versao_do_gradio_igual_no_readme_e_no_requirements():
-    sdk_version = str(ler_cabecalho()["sdk_version"])
-    fixada = ler_requisitos().get("gradio")
-    assert fixada == sdk_version, (
-        f"README.md diz sdk_version {sdk_version}, mas o requirements.txt fixa gradio=={fixada}. Deixe iguais."
-    )
+def test_t16_porta_do_app_bate_com_o_dockerfile():
+    # A porta anunciada no README precisa ser a mesma que o contêiner expõe.
+    porta = str(ler_cabecalho()["app_port"])
+    dockerfile = (RAIZ / "Dockerfile").read_text(encoding="utf-8")
+    assert porta in dockerfile, f"app_port {porta} não aparece no Dockerfile"
 
 
-def test_t16_versao_do_gradio_instalada_e_a_mesma():
-    import gradio
-
-    assert gradio.__version__ == str(ler_cabecalho()["sdk_version"]), (
-        "O Gradio instalado aqui é diferente do publicado; rode: pip install -r requirements-dev.txt"
-    )
-
-
-def test_t16_python_aceito_pela_zerogpu():
-    versao = str(ler_cabecalho()["python_version"])
-    assert versao.startswith(PYTHON_ZEROGPU), f"python_version {versao}: a ZeroGPU aceita {PYTHON_ZEROGPU}"
+def test_t16_gradio_saiu_do_requirements():
+    requisitos = ler_requisitos()
+    assert "gradio" not in requisitos, "O Gradio saiu na Parte 3; remova do requirements.txt"
+    assert "spaces" not in requisitos, "O 'spaces' (ZeroGPU) saiu com o Gradio"
 
 
 def test_t16_campos_visuais_validos():
@@ -114,7 +105,7 @@ def test_t16_requisitos_com_versao_fixa():
 
 
 def _imports_de_terceiros() -> set[str]:
-    arquivos = [RAIZ / "app.py", *(RAIZ / "agente").glob("*.py")]
+    arquivos = list((RAIZ / "agente").glob("*.py"))
     nomes: set[str] = set()
     for arquivo in arquivos:
         for no in ast.walk(ast.parse(arquivo.read_text(encoding="utf-8"))):

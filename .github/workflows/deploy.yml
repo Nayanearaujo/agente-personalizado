@@ -149,7 +149,7 @@ jobs:
         run: python scripts/publicar.py --conferir
 
   avaliar:
-    needs: testes
+    needs: [testes, interface, imagem]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -191,13 +191,6 @@ jobs:
 
       - name: Instalar a biblioteca do Hugging Face
         run: pip install "huggingface_hub==1.33.0" -r requirements-indexacao.txt
-
-      - name: Atualizar o nome do Space
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_USUARIO: ${{ vars.HF_USUARIO || 'oaraujo' }}
-          HF_ORIGEM: ${{ vars.HF_SPACE || 'engenho-de-dados' }}
-        run: python scripts/renomear_space.py
 
       - name: Promover índice aprovado
         id: promover

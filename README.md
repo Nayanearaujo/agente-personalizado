@@ -3,10 +3,8 @@ title: NOA Engenharia de Dados
 emoji: 🦉
 colorFrom: blue
 colorTo: green
-sdk: gradio
-sdk_version: 6.28.0
-python_version: "3.12"
-app_file: app.py
+sdk: docker
+app_port: 7860
 short_description: Engenharia de Dados, estatística e machine learning
 pinned: false
 ---
