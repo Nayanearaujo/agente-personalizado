@@ -109,9 +109,18 @@ class Config:
 
 
 def validar_modo_gratuito(config: Config) -> None:
-    """Bloqueia uma configuração paga antes de publicar ou consultar a IA."""
-    if any(p.nome != "openrouter" or not p.modelo.endswith(":free") for p in config.provedores):
-        raise ErroConfig(["Este projeto usa somente OpenRouter com modelos terminados em :free."])
+    """Bloqueia uma configuração paga antes de publicar ou consultar a IA.
+
+    Aceita modelos terminados em ':free' e também o roteador 'openrouter/free',
+    que seleciona automaticamente um modelo gratuito disponível (sempre sem custo).
+    """
+    def eh_gratuito(modelo: str) -> bool:
+        return modelo.endswith(":free") or modelo == "openrouter/free"
+
+    if any(p.nome != "openrouter" or not eh_gratuito(p.modelo) for p in config.provedores):
+        raise ErroConfig(
+            ["Este projeto usa somente OpenRouter com modelos gratuitos (terminados em :free ou 'openrouter/free')."]
+        )
 
 
 # ------------------------------------------------------------------ leitura
