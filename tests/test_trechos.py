@@ -31,11 +31,12 @@ def test_documento_invalido(texto):
         dividir_documento(texto, "a.md", BaseConhecimento())
 
 
-def test_recusa_arquivo_que_nao_e_markdown(tmp_path):
+def test_recusa_formato_nao_suportado(tmp_path):
+    # Agora .md e .pdf são aceitos; outros formatos (ex.: .docx) são recusados.
     pasta = tmp_path / "documentos"
     pasta.mkdir()
-    (pasta / "a.pdf").write_bytes(b"PDF")
-    with pytest.raises(ValueError, match="Markdown"):
+    (pasta / "a.docx").write_bytes(b"docx")
+    with pytest.raises(ValueError, match="Markdown.*PDF|PDF.*Markdown"):
         carregar_trechos(tmp_path, BaseConhecimento())
 
 

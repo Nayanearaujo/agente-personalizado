@@ -1,3 +1,5 @@
 # Usadas pelo Actions para preparar a coleção de teste.
+# NÃO vão para a imagem do servidor: pymupdf4llm é AGPL e só roda na indexação.
 fastembed==0.8.1
 supabase==2.32.0
+pymupdf4llm==0.0.17

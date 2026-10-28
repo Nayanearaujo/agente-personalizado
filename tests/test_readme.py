@@ -31,6 +31,9 @@ CORES_ACEITAS = {"red", "yellow", "green", "blue", "indigo", "purple", "pink", "
 PYTHON_ZEROGPU = ("3.10", "3.12")
 SEM_VERSAO_FIXA = {"spaces"}  # o Hugging Face fornece a versão certa na ZeroGPU
 NOME_NO_PIP = {"yaml": "pyyaml"}  # import -> nome do pacote
+# Bibliotecas usadas SÓ na indexação (GitHub Actions), nunca no servidor publicado.
+# pymupdf4llm é AGPL e fica em requirements-indexacao.txt de propósito.
+SO_INDEXACAO = {"pymupdf4llm"}
 
 
 def ler_cabecalho() -> dict:
@@ -123,9 +126,16 @@ def _imports_de_terceiros() -> set[str]:
 
 
 def test_t16_toda_biblioteca_usada_esta_no_requirements():
-    """Evita o erro clássico 'ModuleNotFoundError' no build do Space."""
+    """Evita o erro clássico 'ModuleNotFoundError' no build do servidor.
+
+    As bibliotecas de indexação (pymupdf4llm) ficam fora: elas rodam só no
+    GitHub Actions, não na imagem do servidor.
+    """
     requisitos = ler_requisitos()
-    faltando = [m for m in _imports_de_terceiros() if NOME_NO_PIP.get(m, m).lower() not in requisitos]
+    faltando = [
+        m for m in _imports_de_terceiros()
+        if m not in SO_INDEXACAO and NOME_NO_PIP.get(m, m).lower() not in requisitos
+    ]
     assert not faltando, f"Adicione ao requirements.txt: {faltando}"
 
 

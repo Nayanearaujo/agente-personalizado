@@ -76,11 +76,19 @@ def carregar_trechos(raiz: Path, config: BaseConhecimento) -> list[Trecho]:
             raise ValueError("Os documentos não podem usar links para fora da pasta.")
         if arquivo.is_dir():
             continue
-        if arquivo.suffix != ".md":
-            raise ValueError(f"{arquivo.name}: nesta etapa somente Markdown .md é permitido.")
-        trechos.extend(dividir_documento(
-            arquivo.read_text(encoding="utf-8"), arquivo.relative_to(pasta).as_posix(), config,
-        ))
+        extensao = arquivo.suffix.lower()
+        fonte = arquivo.relative_to(pasta).as_posix()
+        if extensao == ".md":
+            texto = arquivo.read_text(encoding="utf-8")
+        elif extensao == ".pdf":
+            if arquivo.stat().st_size > 20 * 1024 * 1024:
+                raise ValueError(f"{arquivo.name}: o PDF passa de 20 MB. Reduza o arquivo.")
+            from agente.pdf import pdf_para_markdown
+
+            texto = pdf_para_markdown(arquivo)
+        else:
+            raise ValueError(f"{arquivo.name}: somente Markdown (.md) e PDF (.pdf) são aceitos na pasta.")
+        trechos.extend(dividir_documento(texto, fonte, config))
     if not trechos:
         raise ValueError("A base precisa de pelo menos um documento com conteúdo.")
     return trechos
