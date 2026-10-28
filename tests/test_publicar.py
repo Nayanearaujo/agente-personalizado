@@ -63,7 +63,8 @@ def test_verificacoes_rodam_mesmo_se_uma_anterior_falhar(workflow):
 def test_publicar_so_depois_dos_testes_e_so_na_main(workflow):
     job = workflow["jobs"]["publicar"]
     assert set(job["needs"]) == {"testes", "avaliar"}
-    assert workflow["jobs"]["avaliar"]["needs"] == "testes"
+    # Na Parte 3, o avaliar só roda depois dos três portões (Python, interface e imagem).
+    assert set(workflow["jobs"]["avaliar"]["needs"]) == {"testes", "interface", "imagem"}
     assert "refs/heads/main" in job["if"]
     assert "pull_request" in job["if"]
     assert job["concurrency"]["cancel-in-progress"] is False
@@ -83,14 +84,16 @@ def test_token_vem_do_secret_e_nao_do_codigo(workflow):
     assert workflow["permissions"] == {"contents": "read"}
 
 
-def test_python_do_ci_igual_ao_do_space(workflow):
-    cabecalho = yaml.safe_load(re.match(r"^---\n(.*?)\n---\n", (RAIZ / "README.md").read_text("utf-8"), re.S)[1])
+def test_python_do_ci_igual_ao_da_imagem(workflow):
+    # A versão do Python do CI tem que ser a mesma que a imagem Docker usa.
+    dockerfile = (RAIZ / "Dockerfile").read_text("utf-8")
+    versao_imagem = re.search(r"FROM python:(\d+\.\d+)", dockerfile)[1]
     for job in workflow["jobs"].values():
         versoes = [p["with"]["python-version"] for p in job["steps"] if "setup-python" in p.get("uses", "")]
         # Jobs que não usam Python (ex.: o job "interface", em Node) são ignorados.
         if not versoes:
             continue
-        assert versoes == [str(cabecalho["python_version"])]
+        assert versoes == [versao_imagem]
 
 
 def test_versao_do_huggingface_hub_igual_no_ci_e_nos_testes(workflow):
