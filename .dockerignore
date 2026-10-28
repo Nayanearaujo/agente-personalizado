@@ -1,0 +1,24 @@
+# Não entra na imagem: reduz o tamanho e evita vazar coisas.
+.git
+.github
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+.venv
+venv
+.ambiente
+tests
+scripts
+documentos
+aulas
+supabase
+frontend/node_modules
+frontend/dist
+*.md
+!README.md
+.env
+.env.*
+.DS_Store
+.gradio
+app.py
