@@ -11,7 +11,7 @@ aparencia:
 ia:
   provedores:
     - nome: openrouter
-      modelo: "thinkingmachines/inkling-small:free"
+      modelo: "openrouter/free"
   max_tokens: 1024
   temperatura: 0.5
   tempo_limite_segundos: 30
