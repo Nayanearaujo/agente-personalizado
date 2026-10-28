@@ -87,6 +87,9 @@ def test_python_do_ci_igual_ao_do_space(workflow):
     cabecalho = yaml.safe_load(re.match(r"^---\n(.*?)\n---\n", (RAIZ / "README.md").read_text("utf-8"), re.S)[1])
     for job in workflow["jobs"].values():
         versoes = [p["with"]["python-version"] for p in job["steps"] if "setup-python" in p.get("uses", "")]
+        # Jobs que não usam Python (ex.: o job "interface", em Node) são ignorados.
+        if not versoes:
+            continue
         assert versoes == [str(cabecalho["python_version"])]
 
 
