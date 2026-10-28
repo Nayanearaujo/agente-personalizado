@@ -97,6 +97,11 @@ def main():
         codigo = getattr(erro, "code", None)
         seguro = codigo if isinstance(codigo, str) and codigo.isalnum() and len(codigo) < 12 else ""
         print(f"Indexação falhou ({type(erro).__name__} {seguro}). Confira banco, chaves e modelo.")
+        # DIAGNÓSTICO TEMPORÁRIO: mostra detalhes do erro da API (sem credenciais).
+        for atributo in ("message", "details", "hint", "code"):
+            valor = getattr(erro, atributo, None)
+            if valor:
+                print(f"  [diag] {atributo}: {valor}")
         return 1
 
 
