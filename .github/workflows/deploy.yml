@@ -61,6 +61,38 @@ jobs:
         if: ${{ !cancelled() }}
         run: python -m pytest -q
 
+  interface:
+    name: interface
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Instalar dependências do front-end
+        working-directory: frontend
+        run: npm install
+
+      - name: "T20: tipos (tsc)"
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: "T20: testes dos componentes (Vitest)"
+        working-directory: frontend
+        run: npm run test
+
+      - name: "T20: build do front-end"
+        working-directory: frontend
+        run: npm run build
+
+      - name: "T20: nenhuma chave no front-end compilado"
+        run: python scripts/procurar_chaves.py
+
   # Botão "Run workflow" fora da main: só CONFERE a configuração do
   # Hugging Face (Space, token, hardware, secrets). Não publica nada.
   conferir:
