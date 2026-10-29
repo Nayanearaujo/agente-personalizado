@@ -28,8 +28,11 @@ export default function App() {
   async function enviar(texto: string) {
     if (!config || ocupado) return;
     ultimaPergunta.current = texto;
-    const historico = [...mensagens];
-    setMensagens([...historico, { papel: "usuario", texto }, { papel: "assistente", texto: "" }]);
+    // Para a tela, guardamos tudo; para o servidor, só as mensagens com texto
+    // de verdade (uma resposta vazia ou com erro não vira contexto, e a API
+    // recusa texto vazio no histórico).
+    const historico = mensagens.filter((m) => m.texto.trim() && !m.erro);
+    setMensagens([...mensagens, { papel: "usuario", texto }, { papel: "assistente", texto: "" }]);
     setOcupado(true);
 
     const atualizarUltima = (parcial: Partial<Mensagem>) =>
